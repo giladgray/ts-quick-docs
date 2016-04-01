@@ -2,13 +2,17 @@ import * as ts from "typescript";
 import * as fs from "fs";
 
 interface DocEntry {
-    name?: string,
-    fileName?: string,
-    documentation?: string,
-    type?: string,
     constructors?: DocEntry[],
+    default?: string;
+    deprecated?: boolean;
+    documentation?: string,
+    fileName?: string,
+    internal?: boolean;
+    name?: string,
+    optional?: boolean;
     parameters?: DocEntry[],
     returnType?: string
+    type?: string,
 };
 
 /** Generate documention for all classes in a set of .ts files */
@@ -34,19 +38,15 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
 
     /** visit nodes finding exported classes */
     function visit(node: ts.Node) {
-        // Only consider exported nodes
-        if (!isNodeExported(node)) {
-            return;
-        }
-
         if (node.kind === ts.SyntaxKind.ClassDeclaration) {
             // This is a top level class, get its symbol
             let symbol = checker.getSymbolAtLocation((<ts.ClassDeclaration>node).name);
             output.push(serializeClass(symbol));
-            // No need to walk any further, class expressions/inner declarations
-            // cannot be exported
-        }
-        else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
+        } else if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
+            // This is a top level interface, get its symbol
+            let symbol = checker.getSymbolAtLocation((<ts.InterfaceDeclaration>node).name);
+            output.push(serializeInterface(symbol));
+        } else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
             // This is a namespace, visit its children
             ts.forEachChild(node, visit);
         }
@@ -57,7 +57,7 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
         return {
             name: symbol.getName(),
             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
-            type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
+            type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration), symbol.valueDeclaration)
         };
     }
 
@@ -71,10 +71,40 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
         return details;
     }
 
+    function serializeInterface(symbol: ts.Symbol) {
+        let details = serializeSymbol(symbol);
+        details.type = "interface";
+
+        // Get the props signatures
+        details.parameters = Object.keys(symbol.members).sort().map((name) => serializeDeclaration(symbol.members[name]));
+        return details;
+    }
+
+    function serializeDeclaration(symbol: ts.Symbol) {
+        let details = serializeSymbol(symbol);
+        details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
+        details.documentation = details.documentation.replace(/@([\w-]+)(?:\s(\S+))?/g, (m, flag, value) => {
+            switch (flag) {
+                case "default":
+                    details.default = value;
+                    break;
+                case "deprecated":
+                    details.deprecated = true;
+                    break;
+                case "internal":
+                    details.internal = true;
+                    break;
+            }
+            // remove flag from output
+            return "";
+        });
+        return details;
+    }
+
     /** Serialize a signature (call or construct) */
     function serializeSignature(signature: ts.Signature) {
         return {
-            paramters: signature.parameters.map(serializeSymbol),
+            parameters: signature.parameters.map(serializeSymbol),
             returnType: checker.typeToString(signature.getReturnType()),
             documentation: ts.displayPartsToString(signature.getDocumentationComment())
         };
@@ -86,6 +116,14 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
     }
 }
 
-generateDocumentation(process.argv.slice(2), {
-    target: ts.ScriptTarget.ES5, module: ts.ModuleKind.CommonJS
-});
+// if run from the command line...
+if (!module.parent) {
+    generateDocumentation(process.argv.slice(2), {
+        target: ts.ScriptTarget.ES6,
+        module: ts.ModuleKind.None,
+        noLib: true,
+        jsx: ts.JsxEmit.React,
+    });
+}
+
+module.exports = generateDocumentation;
