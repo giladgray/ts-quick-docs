@@ -1,5 +1,6 @@
 import * as ts from "typescript";
 import * as fs from "fs";
+import * as path from "path";
 
 interface DocEntry {
     constructors?: DocEntry[],
@@ -16,10 +17,7 @@ interface DocEntry {
 };
 
 /** Generate documention for all classes in a set of .ts files */
-function generateDocumentation(fileNames: string[], options: ts.CompilerOptions): void {
-    // Build a program using the set of root file names in fileNames
-    let program = ts.createProgram(fileNames, options);
-
+function generateDocumentation(program: ts.Program): DocEntry[] {
     // Get the checker, we will use it to find more about classes
     let checker = program.getTypeChecker();
 
@@ -27,14 +25,14 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
 
     // Visit every sourceFile in the program
     for (const sourceFile of program.getSourceFiles()) {
+        if (/\.d\.ts$/.test(sourceFile.fileName)) {
+            continue;
+        }
         // Walk the tree to search for classes
         ts.forEachChild(sourceFile, visit);
     }
 
-    // print out the doc
-    fs.writeFileSync("classes.json", JSON.stringify(output, undefined, 4));
-
-    return;
+    return output;
 
     /** visit nodes finding exported classes */
     function visit(node: ts.Node) {
@@ -45,7 +43,7 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
         } else if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
             // This is a top level interface, get its symbol
             let symbol = checker.getSymbolAtLocation((<ts.InterfaceDeclaration>node).name);
-            output.push(serializeInterface(symbol));
+            output.push(serializeInterface(symbol, node.getSourceFile().fileName));
         } else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
             // This is a namespace, visit its children
             ts.forEachChild(node, visit);
@@ -57,7 +55,7 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
         return {
             name: symbol.getName(),
             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
-            type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration), symbol.valueDeclaration)
+            type: checker.typeToString(checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration))
         };
     }
 
@@ -71,9 +69,10 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
         return details;
     }
 
-    function serializeInterface(symbol: ts.Symbol) {
+    function serializeInterface(symbol: ts.Symbol, fileName: string) {
         let details = serializeSymbol(symbol);
         details.type = "interface";
+        details.fileName = fileName;
 
         // Get the props signatures
         details.parameters = Object.keys(symbol.members).sort().map((name) => serializeDeclaration(symbol.members[name]));
@@ -118,12 +117,14 @@ function generateDocumentation(fileNames: string[], options: ts.CompilerOptions)
 
 // if run from the command line...
 if (!module.parent) {
-    generateDocumentation(process.argv.slice(2), {
+    const program = ts.createProgram(process.argv.slice(2), {
         target: ts.ScriptTarget.ES6,
         module: ts.ModuleKind.None,
         noLib: true,
         jsx: ts.JsxEmit.React,
     });
+    const output = generateDocumentation(program);
+    fs.writeFileSync("classes.json", JSON.stringify(output, null, 4));
 }
 
 module.exports = generateDocumentation;
