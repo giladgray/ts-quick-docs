@@ -1,0 +1,15 @@
+{
+  "name": "tsdoc",
+  "version": "0.0.0",
+  "description": "typescript documentation parser and exported",
+  "main": "index.js",
+  "dependencies": {
+    "typescript": "^1.8.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
