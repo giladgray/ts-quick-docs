@@ -3,7 +3,7 @@
 import * as path from "path";
 import { expect } from "chai";
 
-import { Documentation, IDocEntry } from "../src/documentation";
+import Documentation, { IInterfaceEntry } from "../src/documentation";
 
 describe("Documentation", () => {
     it("works", () => expect(Documentation).to.exist);
@@ -16,22 +16,22 @@ describe("Documentation", () => {
         const docs = fixture("interface.ts");
         expect(docs).to.have.length(1);
         // parameters come out sorted
-        expectEntry(docs[0], "IInterface", ["disabled", "fancy", "value"]);
+        expectInterface(docs[0], "IInterface", ["disabled", "fancy", "value"]);
     });
 
     it("returns const properties", () => {
         const docs = fixture("const.ts");
         expect(docs).to.have.length(1);
-        expectEntry(docs[0], "colors", ["BLUE", "GREEN", "RED"]);
+        expectInterface(docs[0], "colors", ["BLUE", "GREEN", "RED"]);
     });
 
     function fixture(fileName: string) {
         return Documentation.fromFiles([path.join(__dirname, "fixtures", fileName)], { noLib: true });
     }
 
-    function expectEntry(entry: IDocEntry, name: string, parameters?: string[]) {
+    function expectInterface(entry: IInterfaceEntry, name: string, properties?: string[]) {
         expect(entry.name).to.deep.equal(name);
-        expect(entry.parameters.map((p) => p.name)).to.deep.equal(parameters);
-        expect(entry.parameters.every((p) => p.documentation !== ""));
+        expect(entry.properties.map((p) => p.name)).to.deep.equal(properties);
+        expect(entry.properties.every((p) => p.documentation !== ""));
     }
 });

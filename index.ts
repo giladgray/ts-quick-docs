@@ -1,23 +1,9 @@
 import * as ts from "typescript";
 import * as fs from "fs";
-import { Documentation } from "./src/documentation";
-
-interface IDocEntry {
-    constructors?: IDocEntry[];
-    default?: string;
-    deprecated?: boolean;
-    documentation?: string;
-    fileName?: string;
-    internal?: boolean;
-    name?: string;
-    optional?: boolean;
-    parameters?: IDocEntry[];
-    returnType?: string;
-    type?: string;
-};
+import Documentation from "./src/documentation";
 
 /** Generate documention for all classes in a set of .ts files */
-function generateDocumentation(program: ts.Program): IDocEntry[] {
+function generateDocumentation(program: ts.Program) {
     let documention = new Documentation(program);
     return documention.extract();
 }

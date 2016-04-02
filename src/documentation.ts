@@ -3,24 +3,37 @@ import * as path from "path";
 import { resolveFlags } from "./flags";
 
 export interface IDocEntry {
-    constructors?: IDocEntry[];
-    default?: string;
-    deprecated?: boolean;
     documentation?: string;
-    fileName?: string;
-    internal?: boolean;
     name?: string;
-    optional?: boolean;
-    parameters?: IDocEntry[];
-    returnType?: string;
     type?: string;
 };
+
+export interface IPropertyEntry extends IDocEntry {
+    default?: string;
+    deprecated?: boolean;
+    internal?: boolean;
+    optional?: boolean;
+}
+
+export interface IInterfaceEntry extends IDocEntry {
+    properties?: IPropertyEntry[];
+    fileName?: string;
+}
+
+export interface IFunctionEntry extends IDocEntry {
+    parameters?: IPropertyEntry[];
+    returnType?: string;
+}
+
+export interface IClassEntry extends IInterfaceEntry {
+    constructors?: IFunctionEntry[];
+}
 
 export interface IDocumentationOptions {
     ignoreDefinitions?: boolean;
 }
 
-export class Documentation {
+export default class Documentation {
     private program: ts.Program;
     private options: IDocumentationOptions;
 
@@ -39,8 +52,8 @@ export class Documentation {
         this.options = options;
     }
 
-    public extract(): IDocEntry[] {
-        const output: IDocEntry[] = [];
+    public extract(): IInterfaceEntry[] {
+        const output: IInterfaceEntry[] = [];
 
         const visit = (node: ts.Node) => {
             if (node.kind === ts.SyntaxKind.ClassDeclaration) {
@@ -52,7 +65,7 @@ export class Documentation {
                 let symbol = this.checker.getSymbolAtLocation((<ts.InterfaceDeclaration>node).name);
                 output.push(this.serializeInterface(symbol, this.getFileName(node)));
             } else if (node.kind === ts.SyntaxKind.VariableStatement) {
-                let list = (<ts.VariableStatement>node).declarationList.declarations.map((decl): IDocEntry => {
+                let list = (<ts.VariableStatement>node).declarationList.declarations.map((decl) => {
                     const symbol = this.checker.getSymbolAtLocation(decl.name);
                     return this.serializeVariable(symbol, this.getFileName(node));
                 });
@@ -80,10 +93,9 @@ export class Documentation {
         return this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
     }
 
-    private serializeSymbol(symbol: ts.Symbol, fileName?: string): IDocEntry {
+    private serializeSymbol(symbol: ts.Symbol): IDocEntry {
         return {
             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
-            fileName,
             name: symbol.getName(),
             type: this.checker.typeToString(this.getTypeOfSymbol(symbol)),
         };
@@ -91,7 +103,8 @@ export class Documentation {
 
     /** Serialize a class symbol infomration */
     private serializeClass(symbol: ts.Symbol, fileName: string) {
-        let details = this.serializeSymbol(symbol, fileName);
+        let details: IClassEntry = this.serializeSymbol(symbol);
+        details.fileName = fileName;
 
         // Get the construct signatures
         let constructorType = this.getTypeOfSymbol(symbol);
@@ -100,33 +113,36 @@ export class Documentation {
     }
 
     private serializeInterface(symbol: ts.Symbol, fileName: string) {
-        let details = this.serializeSymbol(symbol, fileName);
+        let details: IInterfaceEntry = this.serializeSymbol(symbol);
+        details.fileName = fileName;
         details.type = "interface";
 
         // Get the props signatures
-        details.parameters = Object.keys(symbol.members).sort()
+        details.properties = Object.keys(symbol.members).sort()
             .map((name) => this.serializeDeclaration(symbol.members[name]));
         return details;
     }
 
     private serializeVariable(symbol: ts.Symbol, fileName: string) {
-        let details = this.serializeSymbol(symbol, fileName);
-        details.parameters = this.getTypeOfSymbol(symbol).getProperties().map((s) => this.serializeSymbol(s));
+        let details: IInterfaceEntry = this.serializeSymbol(symbol);
+        details.fileName = fileName;
+        details.properties = this.getTypeOfSymbol(symbol).getProperties().map((s) => this.serializeSymbol(s));
         return details;
     }
 
     private serializeDeclaration(symbol: ts.Symbol) {
-        let details = this.serializeSymbol(symbol);
+        let details: IPropertyEntry = this.serializeSymbol(symbol);
         details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
         return resolveFlags(details);
     }
 
     /** Serialize a signature (call or construct) */
-    private serializeSignature = (signature: ts.Signature) => {
+    private serializeSignature = (signature: ts.Signature): IFunctionEntry => {
         return {
             documentation: ts.displayPartsToString(signature.getDocumentationComment()),
             parameters: signature.parameters.map((symbol) => this.serializeSymbol(symbol)),
             returnType: this.checker.typeToString(signature.getReturnType()),
+            type: this.checker.typeToString(signature.typePredicate.type),
         };
     };
 
