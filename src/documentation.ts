@@ -26,6 +26,14 @@ export class Documentation {
 
     private get checker() { return this.program.getTypeChecker(); }
 
+    public static fromProgram(program: ts.Program, options?: IDocumentationOptions) {
+        return new Documentation(program, options).extract();
+    }
+
+    public static fromFiles(files: string[], compilerOptions?: ts.CompilerOptions, options?: IDocumentationOptions) {
+        return Documentation.fromProgram(ts.createProgram(files, compilerOptions), options);
+    }
+
     constructor(program: ts.Program, options: IDocumentationOptions = {}) {
         this.program = program;
         this.options = options;
@@ -43,7 +51,13 @@ export class Documentation {
                 // This is a top level interface, get its symbol
                 let symbol = this.checker.getSymbolAtLocation((<ts.InterfaceDeclaration>node).name);
                 output.push(this.serializeInterface(symbol, this.getFileName(node)));
-            } else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
+            } else if (node.kind === ts.SyntaxKind.VariableStatement) {
+                let list = (<ts.VariableStatement>node).declarationList.declarations.map((decl): IDocEntry => {
+                    const symbol = this.checker.getSymbolAtLocation(decl.name);
+                    return this.serializeVariable(symbol, this.getFileName(node));
+                });
+                output.push(...list);
+            } else if (node.kind === ts.SyntaxKind.ModuleDeclaration || node.kind === ts.SyntaxKind.VariableStatement) {
                 // This is a namespace, visit its children
                 ts.forEachChild(node, visit);
             }
@@ -92,6 +106,12 @@ export class Documentation {
         // Get the props signatures
         details.parameters = Object.keys(symbol.members).sort()
             .map((name) => this.serializeDeclaration(symbol.members[name]));
+        return details;
+    }
+
+    private serializeVariable(symbol: ts.Symbol, fileName: string) {
+        let details = this.serializeSymbol(symbol, fileName);
+        details.parameters = this.getTypeOfSymbol(symbol).getProperties().map((s) => this.serializeSymbol(s));
         return details;
     }
 
