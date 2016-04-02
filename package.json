@@ -2,13 +2,18 @@
   "name": "tsdoc",
   "version": "0.0.0",
   "description": "typescript documentation parser and exported",
-  "main": "index.js",
+  "main": "dist/index.js",
   "dependencies": {
     "typescript": "^1.8.9"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "2.4.5",
+    "typescript-require": "0.2.9"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rm -r dist/",
+    "compile": "npm run clean && tsc --project .",
+    "test": "mocha --compilers ts:typescript-require test"
   },
   "author": "",
   "license": "ISC"
