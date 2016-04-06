@@ -1,10 +1,10 @@
 import * as ts from "typescript";
 import * as fs from "fs";
-import Documentation from "./src/documentation";
+import Documentation, { IDocumentationOptions } from "./src/documentation";
 
 /** Generate documention for all classes in a set of .ts files */
-function generateDocumentation(program: ts.Program) {
-    let documention = new Documentation(program);
+function generateDocumentation(program: ts.Program, options?: IDocumentationOptions) {
+    let documention = new Documentation(program, options);
     return documention.extract();
 }
 

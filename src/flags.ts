@@ -6,8 +6,10 @@ export const FLAGS = [
     "internal",
 ];
 
+const FLAG_REGEX = /(?:\n\s*)?@([\w-]+)(?:\s([^$]+))?/g;
+
 export function resolveFlags(docEntry: IDocEntry) {
-    docEntry.documentation = docEntry.documentation.replace(/(?:\n\s*)?@([\w-]+)(?:\s(\S+))?/g,
+    docEntry.documentation = docEntry.documentation.replace(FLAG_REGEX,
         (m: string, flag: string, value = true) => {
             if (FLAGS.indexOf(flag) >= 0) {
                 docEntry[flag] = value;
