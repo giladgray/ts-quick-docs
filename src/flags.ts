@@ -6,7 +6,7 @@ export const FLAGS = [
     "internal",
 ];
 
-const FLAG_REGEX = /(?:\n\s*)?@([\w-]+)(?:\s([^$]+))?/g;
+const FLAG_REGEX = /(?:\n\s*)?@([\w-]+)(?:\s([^$@]+))?/g;
 
 export function resolveFlags(docEntry: IDocEntry) {
     docEntry.documentation = docEntry.documentation.replace(FLAG_REGEX,

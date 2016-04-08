@@ -11,6 +11,7 @@
 ## Usage
 
 **CLI**
+
 1. `node ./tsdoc <path/to/file.ts>`
 1. open `classes.json`
 
@@ -21,9 +22,16 @@ const ts = require("ts");
 const program = ts.createProject(files, options);
 
 const tsdoc = require("tsdoc");
-const documentation = tsdoc(program);
+const documentation = tsdoc(program, { /* options */ });
 fs.writeFileSync("classes.json", JSON.stringify(documentation, null, 4));
 ```
+
+## Options
+
+#### ignoreDefinitions: boolean
+
+Whether to exclude `.d.ts` files from the generated documentation blob.
+Useful to ignore imported environment libraries, like `node.d.ts`.
 
 ## TODO
 
