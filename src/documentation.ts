@@ -56,11 +56,7 @@ export default class Documentation {
         const output: IInterfaceEntry[] = [];
 
         const visit = (node: ts.Node) => {
-            if (node.kind === ts.SyntaxKind.ClassDeclaration) {
-                // This is a top level class, get its symbol
-                let symbol = this.checker.getSymbolAtLocation((<ts.ClassDeclaration>node).name);
-                output.push(this.serializeClass(symbol, this.getFileName(node)));
-            } else if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
+            if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
                 // This is a top level interface, get its symbol
                 let symbol = this.checker.getSymbolAtLocation((<ts.InterfaceDeclaration>node).name);
                 output.push(this.serializeInterface(symbol, this.getFileName(node)));
@@ -101,17 +97,6 @@ export default class Documentation {
         };
     }
 
-    /** Serialize a class symbol infomration */
-    private serializeClass(symbol: ts.Symbol, fileName: string) {
-        let details: IClassEntry = this.serializeSymbol(symbol);
-        details.fileName = fileName;
-
-        // Get the construct signatures
-        let constructorType = this.getTypeOfSymbol(symbol);
-        details.constructors = constructorType.getConstructSignatures().map(this.serializeSignature);
-        return details;
-    }
-
     private serializeInterface(symbol: ts.Symbol, fileName: string) {
         let details: IInterfaceEntry = this.serializeSymbol(symbol);
         details.fileName = fileName;
@@ -135,15 +120,4 @@ export default class Documentation {
         details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
         return resolveFlags(details);
     }
-
-    /** Serialize a signature (call or construct) */
-    private serializeSignature = (signature: ts.Signature): IFunctionEntry => {
-        return {
-            documentation: ts.displayPartsToString(signature.getDocumentationComment()),
-            parameters: signature.parameters.map((symbol) => this.serializeSymbol(symbol)),
-            returnType: this.checker.typeToString(signature.getReturnType()),
-            type: this.checker.typeToString(signature.typePredicate.type),
-        };
-    };
-
 }
