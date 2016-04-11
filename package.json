@@ -14,9 +14,9 @@
   "scripts": {
     "clean": "rm -rf {.,src,test}/*.{js,d.ts}",
     "compile": "tsc --project .",
-    "test": "mocha --slow 400",
-    "all": "npm run clean && npm run compile && npm run test",
-    "prepublish": "npm run all"
+    "mocha": "mocha --slow 400",
+    "all": "npm run clean && npm run compile && npm run mocha",
+    "prepublish": "npm run clean && npm run compile"
   },
   "author": "",
   "license": "ISC"
