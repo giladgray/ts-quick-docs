@@ -1,5 +1,4 @@
 import * as ts from "typescript";
-import * as fs from "fs";
 import Documentation, { IDocumentationOptions } from "./src/documentation";
 
 /** Generate documention for all classes in a set of .ts files */
@@ -17,7 +16,9 @@ if (!module.parent) {
         target: ts.ScriptTarget.ES6,
     });
     const output = generateDocumentation(program);
-    fs.writeFileSync("classes.json", JSON.stringify(output, null, 4));
+    /* tslint:disable:no-console */
+    console.log(JSON.stringify(output, null, 2));
+    /* tslint:enable:no-console */
 }
 
 module.exports = generateDocumentation;

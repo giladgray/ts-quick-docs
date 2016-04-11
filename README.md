@@ -2,6 +2,8 @@
 
 > Typescript Documentation Parser
 
+This little tool parses a TypeScript project and spits out a big list of documentation objects for each `interface` and `const` discovered. That data file can be used to generate human-friendly documentation in any desired format.
+
 ## Installation
 
 1. Install Node + npm
@@ -12,7 +14,7 @@
 
 **CLI**
 
-1. `node ./tsdoc <path/to/file.ts>`
+1. `node ./tsdoc [path/to/file.ts]... > [output filename]`
 1. open `classes.json`
 
 **Node API**
@@ -36,6 +38,5 @@ Useful to ignore imported environment libraries, like `node.d.ts`.
 ## TODO
 
 - API design
-- testing
-- options
-- how should it be used?
+- more options
+- simpler usage
