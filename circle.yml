@@ -1,0 +1,21 @@
+machine:
+  pre:
+    # Use gcc 4.9 so that npm module 'utf8-validate' builds correctly
+    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
+    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
+    - sudo wget -O /usr/local/bin/phantomjs https://s3.amazonaws.com/circle-downloads/phantomjs-2.1.1
+  node:
+    version: 5.1
+test:
+  pre:
+    # Circle has no default git config
+    - git config --global user.email "buildnode@circleci.com"
+    - git config --global user.name "Circle CI"
+deployment:
+  npm:
+    tag: /.*/
+    owner: elements
+    commands:
+      - ./scripts/publish.sh

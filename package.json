@@ -1,8 +1,9 @@
 {
-  "name": "tsdoc",
+  "name": "@palantir/tsdoc",
   "version": "0.0.0",
-  "description": "typescript documentation parser and exported",
-  "main": "dist/index.js",
+  "description": "TypeScript documentation parser and exporter",
+  "bin": "index.js",
+  "main": "index.js",
   "dependencies": {
     "typescript": "^1.8.9"
   },
@@ -14,7 +15,8 @@
     "clean": "rm -rf {.,src,test}/*.{js,d.ts}",
     "compile": "tsc --project .",
     "test": "mocha --slow 400",
-    "all": "npm run clean && npm run compile && npm run test"
+    "all": "npm run clean && npm run compile && npm run test",
+    "prepublish": "npm run all"
   },
   "author": "",
   "license": "ISC"
