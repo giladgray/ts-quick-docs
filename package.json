@@ -16,6 +16,7 @@
     "compile": "tsc --project .",
     "mocha": "mocha --slow 400",
     "all": "npm run clean && npm run compile && npm run mocha",
+    "install": "npm run compile",
     "prepublish": "npm run clean && npm run compile"
   },
   "author": "",
