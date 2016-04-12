@@ -26,7 +26,8 @@ describe("Documentation", () => {
     });
 
     function fixture(fileName: string) {
-        return Documentation.fromFiles([path.join(__dirname, "fixtures", fileName)], { noLib: true });
+        const filepath = path.join(__dirname, "fixtures", fileName);
+        return Documentation.fromFiles([filepath], { noLib: true });
     }
 
     function expectInterface(entry: IInterfaceEntry, name: string, properties?: string[]) {
