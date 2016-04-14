@@ -1,4 +1,4 @@
-import { IDocEntry } from "./documentation";
+import { IDocEntry } from "./interfaces";
 
 export const FLAGS = [
     "default",

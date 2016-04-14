@@ -3,7 +3,8 @@
 import * as path from "path";
 import { expect } from "chai";
 
-import Documentation, { IInterfaceEntry } from "../src/documentation";
+import Documentation from "../src/documentation";
+import { IInterfaceEntry } from "../src/interfaces";
 
 describe("Documentation", () => {
     it("works", () => expect(Documentation).to.exist);

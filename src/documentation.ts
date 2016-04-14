@@ -1,24 +1,7 @@
 import * as ts from "typescript";
 import * as path from "path";
 import { resolveFlags } from "./flags";
-
-export interface IDocEntry {
-    documentation?: string;
-    name?: string;
-    type?: string;
-};
-
-export interface IPropertyEntry extends IDocEntry {
-    default?: string;
-    deprecated?: boolean;
-    internal?: boolean;
-    optional?: boolean;
-}
-
-export interface IInterfaceEntry extends IDocEntry {
-    properties?: IPropertyEntry[];
-    fileName?: string;
-}
+import { IDocEntry, IInterfaceEntry, IPropertyEntry } from "./interfaces";
 
 export interface IDocumentationOptions {
     ignoreDefinitions?: boolean;
