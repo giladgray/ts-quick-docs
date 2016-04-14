@@ -1,7 +1,7 @@
 {
-  "name": "@palantir/tsdoc",
+  "name": "ts-quick-docs",
   "version": "0.0.0",
-  "description": "TypeScript documentation parser and exporter",
+  "description": "quick TypeScript documentation extractor",
   "bin": "index.js",
   "main": "index.js",
   "dependencies": {
@@ -16,7 +16,6 @@
     "compile": "tsc --project .",
     "mocha": "mocha --slow 400",
     "all": "npm run clean && npm run compile && npm run mocha",
-    "install": "npm run compile",
     "prepublish": "npm run clean && npm run compile"
   },
   "author": "",

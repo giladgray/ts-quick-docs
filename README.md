@@ -1,6 +1,6 @@
-# tsdoc
+# ts-quick-docs
 
-> Typescript Documentation Parser
+> quick TypeScript documentation extractor
 
 This little tool parses a TypeScript project and spits out a big list of documentation objects for each `interface` and `const` discovered. That data file can be used to generate human-friendly documentation in any desired format.
 
@@ -14,18 +14,18 @@ This little tool parses a TypeScript project and spits out a big list of documen
 
 **CLI**
 
-1. `node ./tsdoc [path/to/file.ts]... > [output filename]`
-1. open `classes.json`
+1. `ts-quick-docs [path/to/file.ts]... > interfaces.json`
+1. open `interfaces.json`
 
 **Node API**
 
 ```js
-const ts = require("ts");
+const ts = require("typescript");
 const program = ts.createProject(files, options);
 
-const tsdoc = require("tsdoc");
+const tsdoc = require("ts-quick-docs");
 const documentation = tsdoc(program, { /* options */ });
-fs.writeFileSync("classes.json", JSON.stringify(documentation, null, 4));
+fs.writeFileSync("interfaces.json", JSON.stringify(documentation, null, 4));
 ```
 
 ## Options
@@ -34,9 +34,3 @@ fs.writeFileSync("classes.json", JSON.stringify(documentation, null, 4));
 
 Whether to exclude `.d.ts` files from the generated documentation blob.
 Useful to ignore imported environment libraries, like `node.d.ts`.
-
-## TODO
-
-- API design
-- more options
-- simpler usage

@@ -20,15 +20,6 @@ export interface IInterfaceEntry extends IDocEntry {
     fileName?: string;
 }
 
-export interface IFunctionEntry extends IDocEntry {
-    parameters?: IPropertyEntry[];
-    returnType?: string;
-}
-
-export interface IClassEntry extends IInterfaceEntry {
-    constructors?: IFunctionEntry[];
-}
-
 export interface IDocumentationOptions {
     ignoreDefinitions?: boolean;
 }
