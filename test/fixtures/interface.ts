@@ -9,3 +9,7 @@ export interface IInterface {
     /** external type */
     fancy?: Element;
 }
+
+export interface IChildInterface extends IInterface, HTMLElement {
+    property: () => void;
+}

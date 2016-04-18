@@ -72,9 +72,17 @@ export default class Documentation {
     }
 
     private serializeInterface(symbol: ts.Symbol, fileName: string) {
-        let details: IInterfaceEntry = this.serializeSymbol(symbol);
-        details.fileName = fileName;
-        details.type = "interface";
+        let details: IInterfaceEntry = {
+            documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
+            fileName,
+            name: symbol.getName(),
+            type: "interface",
+        };
+
+        const interfaceNode = symbol.declarations[0] as ts.InterfaceDeclaration;
+        if (interfaceNode.heritageClauses != null) {
+            details.extends = interfaceNode.heritageClauses[0].types.map((type) => type.getText());
+        }
 
         // Get the props signatures
         details.properties = Object.keys(symbol.members).sort()

@@ -1,5 +1,6 @@
 export interface IDocEntry {
     documentation?: string;
+    inheritedFrom?: string;
     name?: string;
     type?: string;
 };
@@ -12,6 +13,7 @@ export interface IPropertyEntry extends IDocEntry {
 }
 
 export interface IInterfaceEntry extends IDocEntry {
+    extends?: string[];
     properties?: IPropertyEntry[];
     fileName?: string;
 }
