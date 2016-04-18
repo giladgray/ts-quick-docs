@@ -5,7 +5,7 @@
   "bin": "index.js",
   "main": "index.js",
   "dependencies": {
-    "typescript": "^1.8.9"
+    "typescript": "1.8.10"
   },
   "devDependencies": {
     "chai": "3.5.0",
