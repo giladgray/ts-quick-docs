@@ -2,3 +2,5 @@ node_modules/
 scripts/
 typings/
 test/
+*.ts
+!*.d.ts
