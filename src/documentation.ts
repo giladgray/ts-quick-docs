@@ -85,8 +85,10 @@ export default class Documentation {
         }
 
         // Get the props signatures
-        details.properties = Object.keys(symbol.members).sort()
-            .map((name) => this.serializeDeclaration(symbol.members[name]));
+        // symbols without a `valueDeclaration` will crash things on TS 2.0, so filter these out
+        details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
+            .filter((symbol) => symbol.valueDeclaration != null)
+            .map((symbol) => this.serializeDeclaration(symbol));
         return details;
     }
 
