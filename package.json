@@ -1,11 +1,11 @@
 {
   "name": "ts-quick-docs",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "quick TypeScript documentation extractor",
   "bin": "index.js",
   "main": "index.js",
   "dependencies": {
-    "typescript": "1.8.10"
+    "typescript": ">=1.8.10"
   },
   "devDependencies": {
     "chai": "3.5.0",
