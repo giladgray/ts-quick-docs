@@ -3,7 +3,7 @@
 import * as path from "path";
 import { expect } from "chai";
 
-import Documentation from "../src/documentation";
+import Documentation, { IDocumentationOptions } from "../src/documentation";
 import { IDocEntry, IInterfaceEntry } from "../src/interfaces";
 
 describe("TypeScript Documentation", () => {
@@ -12,6 +12,18 @@ describe("TypeScript Documentation", () => {
     it("exists", () => expect(Documentation).to.exist);
 
     it("returns empty array for empty files", () => expect(Documentation.fromFiles([], { noLib: true })).to.be.empty);
+
+    it("excludePaths excludes entire files", () => {
+        let excludeDocs = fixture("interface.ts", { excludePaths: ["interface.ts"] });
+        expect(excludeDocs, "supports string pattern").to.be.empty;
+        excludeDocs = fixture("interface.ts", { excludePaths: [/.*\.ts$/] });
+        expect(excludeDocs, "supports RegExp pattern").to.be.empty;
+    });
+
+    it("excludeNames excludes named items", () => {
+        let excludeDocs = fixture("interface.ts", { excludeNames: ["IInterface"] });
+        expect(excludeDocs.map(i => i.name)).to.not.contain("IInterface");
+    });
 
     describe("for interfaces", () => {
         before(() => docs = fixture("interface.ts"));
@@ -41,6 +53,11 @@ describe("TypeScript Documentation", () => {
             const { properties } = getEntry(docs, "IInterface");
             expect(properties.filter(p => p.optional).map(p => p.name)).to.deep.equal(["disabled", "fancy"]);
         });
+
+        it("excludeNames excludes named properties", () => {
+            let excludeDocs = fixture("interface.ts", { excludeNames: ["value", /^f/] });
+            expectInterface(excludeDocs, "IInterface", ["disabled"]);
+        });
     });
 
     describe("for consts", () => {
@@ -51,9 +68,9 @@ describe("TypeScript Documentation", () => {
         });
     });
 
-    function fixture(fileName: string) {
+    function fixture(fileName: string, options?: IDocumentationOptions) {
         const filepath = path.join(__dirname, "fixtures", fileName);
-        return Documentation.fromFiles([filepath], { noLib: true });
+        return Documentation.fromFiles([filepath], { noLib: true }, options);
     }
 
     function getEntry<T extends IDocEntry>(entries: T[], name: string) {

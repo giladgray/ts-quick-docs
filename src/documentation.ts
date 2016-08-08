@@ -4,6 +4,13 @@ import { resolveFlags } from "./flags";
 import { IDocEntry, IInterfaceEntry, IPropertyEntry } from "./interfaces";
 
 export interface IDocumentationOptions {
+    /** Array of patterns to match against each `name` and omit items that match. */
+    excludeNames?: (string | RegExp)[];
+
+    /** Array of patterns to match against each file path and omit items that match. */
+    excludePaths?: (string | RegExp)[];
+
+    /** Whether `.d.ts` files should always be ignored. */
     ignoreDefinitions?: boolean;
 }
 
@@ -48,11 +55,11 @@ export default class Documentation {
 
         // Visit every sourceFile in the program
         for (const sourceFile of this.program.getSourceFiles()) {
-            if (this.options.ignoreDefinitions && /\.d\.ts$/.test(sourceFile.fileName)) { continue; }
+            if (this.shouldSkipFile(sourceFile.fileName)) { continue; }
             // Walk the tree to search for classes
             ts.forEachChild(sourceFile, visit);
         }
-        return output;
+        return output.filter(this.filterEntryName);
     }
 
     private getFileName(node: ts.Node) {
@@ -87,8 +94,9 @@ export default class Documentation {
         // Get the props signatures
         // symbols without a `valueDeclaration` will crash things on TS 2.0, so filter these out
         details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
-            .filter((symbol) => symbol.valueDeclaration != null)
-            .map((symbol) => this.serializeDeclaration(symbol));
+            .filter((sym) => sym.valueDeclaration != null)
+            .map(this.serializeDeclaration)
+            .filter(this.filterEntryName);
         return details;
     }
 
@@ -99,9 +107,20 @@ export default class Documentation {
         return details;
     }
 
-    private serializeDeclaration(symbol: ts.Symbol) {
+    private serializeDeclaration = (symbol: ts.Symbol) => {
         let details: IPropertyEntry = this.serializeSymbol(symbol);
         details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
         return resolveFlags(details);
+    }
+
+    private filterEntryName = (entry: IInterfaceEntry) => {
+        const { excludeNames = [] } = this.options;
+        return excludeNames.every((pattern) => entry.name.match(pattern as string) == null);
+    }
+
+    private shouldSkipFile(fileName: string) {
+        const { excludePaths, ignoreDefinitions } = this.options;
+        return (ignoreDefinitions && /\.d\.ts$/.test(fileName))
+            || (excludePaths != null && excludePaths.some((pattern) => fileName.match(pattern as string) != null));
     }
 }

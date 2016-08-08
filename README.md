@@ -21,16 +21,25 @@ This little tool parses a TypeScript project and spits out a big list of documen
 
 ```js
 const ts = require("typescript");
-const program = ts.createProject(files, options);
+const program = ts.createProject(files, compilerOptions);
 
 const tsdoc = require("ts-quick-docs");
 const documentation = tsdoc(program, { /* options */ });
+// documentation is an array of IDocEntry items
 fs.writeFileSync("interfaces.json", JSON.stringify(documentation, null, 4));
 ```
 
 ## Options
 
-#### ignoreDefinitions: boolean
+#### excludeNames: `(string | RegExp)[]`
+
+Array of patterns that will be matched against each entity's `name`. Matching entities will be excluded from the output.
+
+#### excludePaths: `(string | RegExp)[]`
+
+Array of patterns that will be matched against each file's path. Matching files will not be parsed and entities in those files will not appear in the output.
+
+#### ignoreDefinitions: `boolean = false`
 
 Whether to exclude `.d.ts` files from the generated documentation blob.
 Useful to ignore imported environment libraries, like `node.d.ts`.
