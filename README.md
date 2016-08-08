@@ -43,3 +43,7 @@ Array of patterns that will be matched against each file's path. Matching files 
 
 Whether to exclude `.d.ts` files from the generated documentation blob.
 Useful to ignore imported environment libraries, like `node.d.ts`.
+
+#### includeBasicTypeProperties: `boolean = false`
+
+Whether built-in properties for basic types should appear in the output (such as `String.prototype.toString`). Basic types include boolean, number, string, and arrays of those three. Defaults to `false` because these properties tend to pollute output for no benefit.

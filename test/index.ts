@@ -66,6 +66,24 @@ describe("TypeScript Documentation", () => {
         it("returns const properties", () => {
             expectInterface(docs, "colors", ["BLUE", "GREEN", "RED"]);
         });
+
+        it("includeBasicTypeProperties=false has zero string properties", () => {
+            const filepath = path.join(__dirname, "fixtures", "const.ts");
+            const basicDocs = Documentation.fromFiles([filepath], { noLib: false }, {
+                ignoreDefinitions: true,
+                includeBasicTypeProperties: false,
+            });
+            expect(basicDocs[1].properties).to.be.empty;
+        });
+
+        it("includeBasicTypeProperties=true includes tons of string properties", () => {
+            const filepath = path.join(__dirname, "fixtures", "const.ts");
+            const basicDocs = Documentation.fromFiles([filepath], { noLib: false }, {
+                ignoreDefinitions: true,
+                includeBasicTypeProperties: true,
+            });
+            expect(basicDocs[1].properties.map(p => p.name)).to.contain.members(["toString", "lastIndexOf", "match"]);
+        });
     });
 
     function fixture(fileName: string, options?: IDocumentationOptions) {

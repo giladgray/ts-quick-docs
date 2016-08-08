@@ -7,3 +7,5 @@ export const colors = {
     /** from the fire */
     RED: "red",
 };
+
+export const FILE_NAME = "boomtown.tsx";

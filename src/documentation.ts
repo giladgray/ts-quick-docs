@@ -12,6 +12,12 @@ export interface IDocumentationOptions {
 
     /** Whether `.d.ts` files should always be ignored. */
     ignoreDefinitions?: boolean;
+
+    /**
+     * Whether built-in properties for basic types should appear in the output (such as String.prototype.toString).
+     * Defaults to `false` because these properties tend to pollute output for no benefit.
+     */
+    includeBasicTypeProperties?: boolean;
 }
 
 export default class Documentation {
@@ -103,7 +109,12 @@ export default class Documentation {
     private serializeVariable(symbol: ts.Symbol, fileName: string) {
         let details: IInterfaceEntry = this.serializeSymbol(symbol);
         details.fileName = fileName;
-        details.properties = this.getTypeOfSymbol(symbol).getProperties().map((s) => this.serializeSymbol(s));
+        if (this.options.includeBasicTypeProperties || !/^(boolean|number|string)(\[\])?$/.test(details.type)) {
+            // only get properties for a variable if it's not a basic type (or user explicitly enabled basic types)
+            details.properties = this.getTypeOfSymbol(symbol).getProperties().map((s) => this.serializeSymbol(s));
+        } else {
+            details.properties = [];
+        }
         return details;
     }
 
