@@ -12,22 +12,35 @@ This little tool parses a TypeScript project and spits out a big list of documen
 
 ## Usage
 
-**CLI**
+#### CLI
 
 1. `ts-quick-docs [path/to/file.ts]... > interfaces.json`
 1. open `interfaces.json`
 
-**Node API**
+#### Node API
+
+##### From TypeScript program:
 
 ```js
 const ts = require("typescript");
-const program = ts.createProject(files, compilerOptions);
+const program = ts.createProgram(files, compilerOptions);
 
 const tsdoc = require("ts-quick-docs");
 const documentation = tsdoc(program, { /* options */ });
 // documentation is an array of IDocEntry items
 fs.writeFileSync("interfaces.json", JSON.stringify(documentation, null, 4));
 ```
+
+##### From set of files:
+
+```js
+const tsdoc = require("ts-quick-docs");
+const documentation = tsdoc.fromFiles(files, compilerOptions, { /* options */ });
+// documentation is an array of IDocEntry items
+fs.writeFileSync("interfaces.json", JSON.stringify(documentation, null, 4));
+```
+
+_Note that `files` must be an array but it can contain just the entry file if it imports others. A dummy TS program is created internally so we'll walk that tree for you._
 
 ## Options
 
