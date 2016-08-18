@@ -7,7 +7,10 @@ export interface IInterface {
     disabled?: boolean;
 
     /** external type */
-    fancy?: Element;
+    fancy?: HTMLElement;
+
+    /** non-primitive type */
+    lastEdited: Date;
 }
 
 export interface IChildInterface extends IInterface, HTMLElement {

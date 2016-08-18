@@ -45,12 +45,12 @@ describe("TypeScript Documentation", function (this: Mocha) {
 
         it("returns interface properties", () => {
             // parameters come out sorted
-            expectInterface(docs, "IInterface", ["disabled", "fancy", "value"]);
+            expectInterface(docs, "IInterface", ["disabled", "fancy", "lastEdited", "value"]);
         });
 
         it("detects property type", () => {
             const { properties } = getEntry(docs, "IInterface");
-            expect(properties.map(p => p.type)).to.deep.equal(["boolean", "any", "string"]);
+            expect(properties.map(p => p.type)).to.deep.equal(["boolean", "HTMLElement", "Date", "string"]);
         });
 
         it("detects optional properties", () => {
@@ -59,8 +59,8 @@ describe("TypeScript Documentation", function (this: Mocha) {
         });
 
         it("excludeNames excludes named properties", () => {
-            let excludeDocs = fixture("interface.ts", { excludeNames: ["value", /^f/] });
-            expectInterface(excludeDocs, "IInterface", ["disabled"]);
+            let excludeDocs = fixture("interface.ts", { excludeNames: ["value", /ed$/] });
+            expectInterface(excludeDocs, "IInterface", ["fancy"]);
         });
     });
 
@@ -90,9 +90,18 @@ describe("TypeScript Documentation", function (this: Mocha) {
         });
     });
 
-    function fixture(fileName: string, options?: IDocumentationOptions) {
+    describe("with external dependencies", () => {
+        it("knows about external properties", () => {
+            docs = fixture("external.ts", {}, ["./typings/globals/react/index.d.ts"]);
+            expect(getEntry(docs, "IReactProps").properties.map(p => p.type))
+                .to.deep.equal(["__React.EventHandler<MouseEvent>", "ReactElement<any> | string | number"]);
+        });
+    });
+
+    function fixture(fileName: string, options: IDocumentationOptions = {}, additionalFiles: string[] = []) {
+        options.excludePaths = (options.excludePaths || []).concat("node_modules/");
         const filepath = path.join(__dirname, "fixtures", fileName);
-        return Documentation.fromFiles([filepath], { noLib: true }, options);
+        return Documentation.fromFiles(additionalFiles.concat(filepath), {}, options);
     }
 
     function getEntry<T extends IDocEntry>(entries: T[], name: string) {
