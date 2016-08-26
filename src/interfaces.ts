@@ -8,7 +8,7 @@ export interface IDocEntry {
 
 export interface IPropertyEntry extends IDocEntry {
     default?: string;
-    deprecated?: boolean;
+    deprecated?: string;
     internal?: boolean;
     optional?: boolean;
 }
