@@ -3,7 +3,7 @@ machine:
     version: 5.3
 dependencies:
   pre:
-    - npm install typings
+    - npm install -g typings
     - typings install
 test:
   pre:
