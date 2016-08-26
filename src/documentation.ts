@@ -61,11 +61,11 @@ export default class Documentation {
 
         // Visit every sourceFile in the program
         for (const sourceFile of this.program.getSourceFiles()) {
-            if (this.shouldSkipFile(sourceFile.fileName)) { continue; }
+            if (this.options.ignoreDefinitions && /\.d\.ts$/.test(sourceFile.fileName)) { continue; }
             // Walk the tree to search for classes
             ts.forEachChild(sourceFile, visit);
         }
-        return output.filter(this.filterEntryName);
+        return output.filter(this.filterEntry);
     }
 
     private getFileName(node: ts.Node) {
@@ -76,12 +76,25 @@ export default class Documentation {
         return this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
     }
 
-    private serializeSymbol(symbol: ts.Symbol): IDocEntry {
+    private getTypeString(symbol: ts.Symbol) {
+        return this.checker.typeToString(this.getTypeOfSymbol(symbol), null,
+            // this flag will include namespaces such as __React
+            ts.TypeFormatFlags.UseFullyQualifiedType);
+    }
+
+    private serializeSymbol(symbol: ts.Symbol, fileName: string): IDocEntry {
         return {
             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
+            fileName,
             name: symbol.getName(),
-            type: this.checker.typeToString(this.getTypeOfSymbol(symbol)),
+            type: this.getTypeString(symbol),
         };
+    }
+
+    private serializeDeclaration = (symbol: ts.Symbol, fileName: string) => {
+        let details: IPropertyEntry = this.serializeSymbol(symbol, fileName);
+        details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
+        return resolveFlags(details);
     }
 
     private serializeInterface(symbol: ts.Symbol, fileName: string) {
@@ -101,37 +114,31 @@ export default class Documentation {
         // symbols without a `valueDeclaration` will crash things on TS 2.0, so filter these out
         details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
             .filter((sym) => sym.valueDeclaration != null)
-            .map(this.serializeDeclaration)
-            .filter(this.filterEntryName);
+            .map((sym) => this.serializeDeclaration(sym, fileName))
+            .filter(this.filterEntry);
         return details;
     }
 
     private serializeVariable(symbol: ts.Symbol, fileName: string) {
-        let details: IInterfaceEntry = this.serializeSymbol(symbol);
+        let details: IInterfaceEntry = this.serializeSymbol(symbol, fileName);
         details.fileName = fileName;
         if (this.options.includeBasicTypeProperties || !/^(boolean|number|string)(\[\])?$/.test(details.type)) {
             // only get properties for a variable if it's not a basic type (or user explicitly enabled basic types)
-            details.properties = this.getTypeOfSymbol(symbol).getProperties().map((s) => this.serializeSymbol(s));
+            details.properties = this.getTypeOfSymbol(symbol).getProperties()
+                .map((s) => this.serializeSymbol(s, fileName));
         } else {
             details.properties = [];
         }
         return details;
     }
 
-    private serializeDeclaration = (symbol: ts.Symbol) => {
-        let details: IPropertyEntry = this.serializeSymbol(symbol);
-        details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
-        return resolveFlags(details);
+    private filterEntry = (entry: IInterfaceEntry) => {
+        const { excludeNames, excludePaths } = this.options;
+        return testNoMatches(entry.name, excludeNames) && testNoMatches(entry.fileName, excludePaths);
     }
+}
 
-    private filterEntryName = (entry: IInterfaceEntry) => {
-        const { excludeNames = [] } = this.options;
-        return excludeNames.every((pattern) => entry.name.match(pattern as string) == null);
-    }
-
-    private shouldSkipFile(fileName: string) {
-        const { excludePaths, ignoreDefinitions } = this.options;
-        return (ignoreDefinitions && /\.d\.ts$/.test(fileName))
-            || (excludePaths != null && excludePaths.some((pattern) => fileName.match(pattern as string) != null));
-    }
+/** Returns true if the value matches exactly none of the patterns. */
+function testNoMatches(value: string, patterns: (string | RegExp)[] = []) {
+    return patterns.every((pattern) => value.match(pattern as string) == null);
 }
