@@ -12,11 +12,11 @@
     "mocha": "2.4.5"
   },
   "scripts": {
+    "all": "npm run clean && npm run compile && npm run mocha",
     "clean": "rm -rf {.,src,test}/*.{js,d.ts}",
     "compile": "tsc --project .",
-    "mocha": "mocha --slow 400",
-    "all": "npm run clean && npm run compile && npm run mocha",
-    "prepublish": "npm run clean && npm run compile"
+    "prepublish": "npm run clean && npm run compile",
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC"
