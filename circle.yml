@@ -1,10 +1,6 @@
 machine:
   node:
     version: 5.3
-dependencies:
-  pre:
-    - npm install -g mocha chai typings
-    - typings install
 test:
   pre:
     # Circle has no default git config
@@ -13,6 +9,5 @@ test:
 deployment:
   npm:
     tag: /.*/
-    owner: elements
     commands:
-      - ./scripts/publish.sh
+      - npm publish

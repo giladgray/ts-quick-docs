@@ -2,7 +2,6 @@
 
 import * as path from "path";
 import { expect } from "chai";
-import { ModuleKind } from "typescript";
 
 import Documentation, { IDocumentationOptions } from "../src/documentation";
 import { IDocEntry, IInterfaceEntry } from "../src/interfaces";

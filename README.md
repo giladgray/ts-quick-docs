@@ -1,4 +1,4 @@
-# ts-quick-docs
+# ts-quick-docs ![NPM](https://img.shields.io/npm/v/ts-quick-docs.svg) ![Circle CI](https://img.shields.io/circleci/project/giladgray/ts-quick-docs.svg)
 
 > quick TypeScript documentation extractor
 
