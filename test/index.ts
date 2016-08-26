@@ -2,11 +2,15 @@
 
 import * as path from "path";
 import { expect } from "chai";
+import { ModuleKind } from "typescript";
 
 import Documentation, { IDocumentationOptions } from "../src/documentation";
 import { IDocEntry, IInterfaceEntry } from "../src/interfaces";
 
-describe("TypeScript Documentation", () => {
+describe("TypeScript Documentation", function (this: Mocha) {
+    this.slow(2000);
+    this.timeout(5000);
+
     let docs: IInterfaceEntry[];
 
     it("exists", () => expect(Documentation).to.exist);
