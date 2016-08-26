@@ -77,7 +77,9 @@ export default class Documentation {
     }
 
     private getTypeString(symbol: ts.Symbol) {
-        return this.checker.typeToString(this.getTypeOfSymbol(symbol), null, ts.TypeFormatFlags.UseFullyQualifiedType);
+        return this.checker.typeToString(this.getTypeOfSymbol(symbol), null,
+            // this flag will include namespaces such as __React
+            ts.TypeFormatFlags.UseFullyQualifiedType);
     }
 
     private serializeSymbol(symbol: ts.Symbol, fileName: string): IDocEntry {
@@ -87,6 +89,12 @@ export default class Documentation {
             name: symbol.getName(),
             type: this.getTypeString(symbol),
         };
+    }
+
+    private serializeDeclaration = (symbol: ts.Symbol, fileName: string) => {
+        let details: IPropertyEntry = this.serializeSymbol(symbol, fileName);
+        details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
+        return resolveFlags(details);
     }
 
     private serializeInterface(symbol: ts.Symbol, fileName: string) {
@@ -124,18 +132,13 @@ export default class Documentation {
         return details;
     }
 
-    private serializeDeclaration = (symbol: ts.Symbol, fileName: string) => {
-        let details: IPropertyEntry = this.serializeSymbol(symbol, fileName);
-        details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
-        return resolveFlags(details);
-    }
-
     private filterEntry = (entry: IInterfaceEntry) => {
         const { excludeNames = [], excludePaths = [] } = this.options;
         return testNoMatches(entry.name, excludeNames) && testNoMatches(entry.fileName, excludePaths);
     }
 }
 
+/** Returns true if the value matches exactly none of the patterns. */
 function testNoMatches(value: string, patterns: (string | RegExp)[]) {
     return patterns.every((pattern) => value.match(pattern as string) == null);
 }
