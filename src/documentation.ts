@@ -76,11 +76,16 @@ export default class Documentation {
         return this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
     }
 
-    private serializeSymbol(symbol: ts.Symbol): IDocEntry {
+    private getTypeString(symbol: ts.Symbol) {
+        return this.checker.typeToString(this.getTypeOfSymbol(symbol), null, ts.TypeFormatFlags.UseFullyQualifiedType);
+    }
+
+    private serializeSymbol(symbol: ts.Symbol, fileName: string): IDocEntry {
         return {
             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
+            fileName,
             name: symbol.getName(),
-            type: this.checker.typeToString(this.getTypeOfSymbol(symbol)),
+            type: this.getTypeString(symbol),
         };
     }
 
@@ -101,25 +106,26 @@ export default class Documentation {
         // symbols without a `valueDeclaration` will crash things on TS 2.0, so filter these out
         details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
             .filter((sym) => sym.valueDeclaration != null)
-            .map(this.serializeDeclaration)
+            .map((sym) => this.serializeDeclaration(sym, fileName))
             .filter(this.filterEntry);
         return details;
     }
 
     private serializeVariable(symbol: ts.Symbol, fileName: string) {
-        let details: IInterfaceEntry = this.serializeSymbol(symbol);
+        let details: IInterfaceEntry = this.serializeSymbol(symbol, fileName);
         details.fileName = fileName;
         if (this.options.includeBasicTypeProperties || !/^(boolean|number|string)(\[\])?$/.test(details.type)) {
             // only get properties for a variable if it's not a basic type (or user explicitly enabled basic types)
-            details.properties = this.getTypeOfSymbol(symbol).getProperties().map((s) => this.serializeSymbol(s));
+            details.properties = this.getTypeOfSymbol(symbol).getProperties()
+                .map((s) => this.serializeSymbol(s, fileName));
         } else {
             details.properties = [];
         }
         return details;
     }
 
-    private serializeDeclaration = (symbol: ts.Symbol) => {
-        let details: IPropertyEntry = this.serializeSymbol(symbol);
+    private serializeDeclaration = (symbol: ts.Symbol, fileName: string) => {
+        let details: IPropertyEntry = this.serializeSymbol(symbol, fileName);
         details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
         return resolveFlags(details);
     }
