@@ -50,7 +50,7 @@ Array of patterns that will be matched against each entity's `name`. Matching en
 
 #### excludePaths: `(string | RegExp)[]`
 
-Array of patterns that will be matched against each file's path. Matching files will not be parsed and entities in those files will not appear in the output.
+Array of patterns that will be matched against each file's path. Matching files _will be_ parsed but entities in those files _will not_ appear in the output.
 
 #### ignoreDefinitions: `boolean = false`
 
