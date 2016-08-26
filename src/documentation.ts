@@ -61,11 +61,11 @@ export default class Documentation {
 
         // Visit every sourceFile in the program
         for (const sourceFile of this.program.getSourceFiles()) {
-            if (this.shouldSkipFile(sourceFile.fileName)) { continue; }
+            if (this.options.ignoreDefinitions && /\.d\.ts$/.test(sourceFile.fileName)) { continue; }
             // Walk the tree to search for classes
             ts.forEachChild(sourceFile, visit);
         }
-        return output.filter(this.filterEntryName);
+        return output.filter(this.filterEntry);
     }
 
     private getFileName(node: ts.Node) {
@@ -102,7 +102,7 @@ export default class Documentation {
         details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
             .filter((sym) => sym.valueDeclaration != null)
             .map(this.serializeDeclaration)
-            .filter(this.filterEntryName);
+            .filter(this.filterEntry);
         return details;
     }
 
@@ -124,14 +124,12 @@ export default class Documentation {
         return resolveFlags(details);
     }
 
-    private filterEntryName = (entry: IInterfaceEntry) => {
-        const { excludeNames = [] } = this.options;
-        return excludeNames.every((pattern) => entry.name.match(pattern as string) == null);
+    private filterEntry = (entry: IInterfaceEntry) => {
+        const { excludeNames = [], excludePaths = [] } = this.options;
+        return testNoMatches(entry.name, excludeNames) && testNoMatches(entry.fileName, excludePaths);
     }
+}
 
-    private shouldSkipFile(fileName: string) {
-        const { excludePaths, ignoreDefinitions } = this.options;
-        return (ignoreDefinitions && /\.d\.ts$/.test(fileName))
-            || (excludePaths != null && excludePaths.some((pattern) => fileName.match(pattern as string) != null));
-    }
+function testNoMatches(value: string, patterns: (string | RegExp)[]) {
+    return patterns.every((pattern) => value.match(pattern as string) == null);
 }
