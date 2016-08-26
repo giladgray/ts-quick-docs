@@ -111,9 +111,8 @@ export default class Documentation {
         }
 
         // Get the props signatures
-        // symbols without a `valueDeclaration` will crash things on TS 2.0, so filter these out
         details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
-            .filter((sym) => sym.valueDeclaration != null)
+            .filter(this.filterValueDeclaration)
             .map((sym) => this.serializeDeclaration(sym, fileName))
             .filter(this.filterEntry);
         return details;
@@ -125,12 +124,16 @@ export default class Documentation {
         if (this.options.includeBasicTypeProperties || !/^(boolean|number|string)(\[\])?$/.test(details.type)) {
             // only get properties for a variable if it's not a basic type (or user explicitly enabled basic types)
             details.properties = this.getTypeOfSymbol(symbol).getProperties()
+                .filter(this.filterValueDeclaration)
                 .map((s) => this.serializeSymbol(s, fileName));
         } else {
             details.properties = [];
         }
         return details;
     }
+
+    // symbols without a `valueDeclaration` will crash things on TS 2.0, so filter these out
+    private filterValueDeclaration = (sym: ts.Symbol) => sym.valueDeclaration != null;
 
     private filterEntry = (entry: IInterfaceEntry) => {
         const { excludeNames, excludePaths } = this.options;
