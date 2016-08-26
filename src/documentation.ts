@@ -133,12 +133,12 @@ export default class Documentation {
     }
 
     private filterEntry = (entry: IInterfaceEntry) => {
-        const { excludeNames = [], excludePaths = [] } = this.options;
+        const { excludeNames, excludePaths } = this.options;
         return testNoMatches(entry.name, excludeNames) && testNoMatches(entry.fileName, excludePaths);
     }
 }
 
 /** Returns true if the value matches exactly none of the patterns. */
-function testNoMatches(value: string, patterns: (string | RegExp)[]) {
+function testNoMatches(value: string, patterns: (string | RegExp)[] = []) {
     return patterns.every((pattern) => value.match(pattern as string) == null);
 }
