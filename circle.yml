@@ -1,10 +1,6 @@
 machine:
   node:
     version: 5.3
-dependencies:
-  pre:
-    - npm install -g typings
-    - typings install
 test:
   pre:
     # Circle has no default git config
