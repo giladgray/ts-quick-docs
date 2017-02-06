@@ -1,6 +1,6 @@
 import * as React from "react";
 
 export interface IReactProps {
-    onClick: React.MouseEventHandler;
+    onClick: React.MouseEventHandler<HTMLElement>;
     submenu: React.ReactChild;
 }
