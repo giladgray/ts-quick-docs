@@ -14,6 +14,7 @@
     "@types/react": "15.0.6",
     "chai": "3.5.0",
     "mocha": "2.4.5",
+    "ts-node": "2.0.0",
     "tslint": "4.4.2"
   },
   "scripts": {
@@ -22,7 +23,7 @@
     "compile": "tsc --project .",
     "lint": "tslint --project tsconfig.json",
     "prepublish": "npm run clean && npm run compile",
-    "test": "mocha"
+    "test": "mocha --compilers ts:ts-node/register"
   },
   "author": "",
   "license": "ISC"
