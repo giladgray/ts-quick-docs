@@ -4,18 +4,14 @@
 
 This little tool parses a TypeScript project and spits out a big list of documentation objects for each `interface` and `const` discovered. That data file can be used to generate human-friendly documentation in any desired format.
 
-## Installation
-
-1. Install Node + npm
-1. Install [typings]()
-1. `npm install && typings install`
-
 ## Usage
 
 #### CLI
 
 1. `ts-quick-docs [path/to/file.ts]... > interfaces.json`
 1. open `interfaces.json`
+
+_Note: options are not supported from the CLI._
 
 #### Node API
 
