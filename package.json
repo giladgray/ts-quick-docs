@@ -23,7 +23,6 @@
     "clean": "rm -rf dist",
     "compile": "tsc --project .",
     "lint": "tslint --project tsconfig.json",
-    "prepublish": "npm run clean && npm run compile",
     "test": "mocha --compilers ts:ts-node/register"
   },
   "author": "",
