@@ -16,5 +16,4 @@ if (!module.parent) {
     console.log(JSON.stringify(output, null, 2));
 }
 
-module.exports = Documentation.fromProgram;
-module.exports.fromFiles = Documentation.fromFiles;
+export default Documentation;
