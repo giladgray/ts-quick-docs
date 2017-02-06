@@ -13,7 +13,7 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
     it("exists", () => expect(Documentation).to.exist);
 
     it.skip("returns empty array for empty files", () => {
-        expect(Documentation.fromFiles([], { noLib: true })).to.be.empty
+        expect(Documentation.fromFiles([], { noLib: true })).to.be.empty;
     });
 
     it("excludePaths excludes entire files", () => {
