@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as ts from "typescript";
-import Documentation from "./src/documentation";
+import Documentation from "./documentation";
 
 // if run from the command line...
 if (!module.parent) {

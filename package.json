@@ -2,8 +2,8 @@
   "name": "ts-quick-docs",
   "version": "0.4.0",
   "description": "quick TypeScript documentation extractor",
-  "bin": "index.js",
-  "main": "index.js",
+  "bin": "dist/index.js",
+  "main": "dist/index.js",
   "dependencies": {
     "typescript": ">=2.0.0"
   },
@@ -18,7 +18,7 @@
   },
   "scripts": {
     "all": "npm run clean && npm run compile && npm run mocha",
-    "clean": "rm -rf {.,src,test}/*.{js,d.ts}",
+    "clean": "rm -rf dist",
     "compile": "tsc --project .",
     "lint": "tslint --project tsconfig.json",
     "prepublish": "npm run clean && npm run compile",
