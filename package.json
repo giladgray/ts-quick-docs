@@ -9,12 +9,14 @@
   },
   "devDependencies": {
     "chai": "3.5.0",
-    "mocha": "2.4.5"
+    "mocha": "2.4.5",
+    "tslint": "4.4.2"
   },
   "scripts": {
     "all": "npm run clean && npm run compile && npm run mocha",
     "clean": "rm -rf {.,src,test}/*.{js,d.ts}",
     "compile": "tsc --project .",
+    "lint": "tslint --project tsconfig.json",
     "prepublish": "npm run clean && npm run compile",
     "test": "mocha"
   },

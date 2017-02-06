@@ -1,14 +1,14 @@
-import * as ts from "typescript";
 import * as path from "path";
+import * as ts from "typescript";
 import { resolveFlags } from "./flags";
 import { IDocEntry, IInterfaceEntry, IPropertyEntry } from "./interfaces";
 
 export interface IDocumentationOptions {
     /** Array of patterns to match against each `name` and omit items that match. */
-    excludeNames?: (string | RegExp)[];
+    excludeNames?: Array<string | RegExp>;
 
     /** Array of patterns to match against each file path and omit items that match. */
-    excludePaths?: (string | RegExp)[];
+    excludePaths?: Array<string | RegExp>;
 
     /** Whether `.d.ts` files should always be ignored. */
     ignoreDefinitions?: boolean;
@@ -21,11 +21,6 @@ export interface IDocumentationOptions {
 }
 
 export default class Documentation {
-    private program: ts.Program;
-    private options: IDocumentationOptions;
-
-    private get checker() { return this.program.getTypeChecker(); }
-
     public static fromProgram(program: ts.Program, options?: IDocumentationOptions) {
         return new Documentation(program, options).extract();
     }
@@ -33,6 +28,11 @@ export default class Documentation {
     public static fromFiles(files: string[], compilerOptions?: ts.CompilerOptions, options?: IDocumentationOptions) {
         return Documentation.fromProgram(ts.createProgram(files, compilerOptions), options);
     }
+
+    private program: ts.Program;
+    private options: IDocumentationOptions;
+
+    private get checker() { return this.program.getTypeChecker(); }
 
     constructor(program: ts.Program, options: IDocumentationOptions = {}) {
         this.program = program;
@@ -45,10 +45,10 @@ export default class Documentation {
         const visit = (node: ts.Node) => {
             if (node.kind === ts.SyntaxKind.InterfaceDeclaration) {
                 // This is a top level interface, get its symbol
-                let symbol = this.checker.getSymbolAtLocation((<ts.InterfaceDeclaration>node).name);
+                const symbol = this.checker.getSymbolAtLocation((node as ts.InterfaceDeclaration).name);
                 output.push(this.serializeInterface(symbol, this.getFileName(node)));
             } else if (node.kind === ts.SyntaxKind.VariableStatement) {
-                let list = (<ts.VariableStatement>node).declarationList.declarations.map((decl) => {
+                const list = (node as ts.VariableStatement).declarationList.declarations.map((decl) => {
                     const symbol = this.checker.getSymbolAtLocation(decl.name);
                     return this.serializeVariable(symbol, this.getFileName(node));
                 });
@@ -92,13 +92,14 @@ export default class Documentation {
     }
 
     private serializeDeclaration = (symbol: ts.Symbol, fileName: string) => {
-        let details: IPropertyEntry = this.serializeSymbol(symbol, fileName);
+        const details: IPropertyEntry = this.serializeSymbol(symbol, fileName);
+        // tslint:disable-next-line:no-bitwise
         details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
         return resolveFlags(details);
     }
 
     private serializeInterface(symbol: ts.Symbol, fileName: string) {
-        let details: IInterfaceEntry = {
+        const details: IInterfaceEntry = {
             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
             fileName,
             name: symbol.getName(),
@@ -119,7 +120,7 @@ export default class Documentation {
     }
 
     private serializeVariable(symbol: ts.Symbol, fileName: string) {
-        let details: IInterfaceEntry = this.serializeSymbol(symbol, fileName);
+        const details: IInterfaceEntry = this.serializeSymbol(symbol, fileName);
         details.fileName = fileName;
         if (this.options.includeBasicTypeProperties || !/^(boolean|number|string)(\[\])?$/.test(details.type)) {
             // only get properties for a variable if it's not a basic type (or user explicitly enabled basic types)
@@ -142,6 +143,6 @@ export default class Documentation {
 }
 
 /** Returns true if the value matches exactly none of the patterns. */
-function testNoMatches(value: string, patterns: (string | RegExp)[] = []) {
+function testNoMatches(value: string, patterns: Array<string | RegExp> = []) {
     return patterns.every((pattern) => value.match(pattern as string) == null);
 }

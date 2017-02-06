@@ -1,12 +1,10 @@
-/// <reference path="../typings/index.d.ts"/>
-
-import * as path from "path";
 import { expect } from "chai";
+import * as path from "path";
 
 import Documentation, { IDocumentationOptions } from "../src/documentation";
 import { IDocEntry, IInterfaceEntry } from "../src/interfaces";
 
-describe("TypeScript Documentation", function (this: Mocha) {
+describe("TypeScript Documentation", function(this: Mocha) {
     this.slow(2000);
     this.timeout(5000);
 
@@ -24,8 +22,8 @@ describe("TypeScript Documentation", function (this: Mocha) {
     });
 
     it("excludeNames excludes named items", () => {
-        let excludeDocs = fixture("interface.ts", { excludeNames: ["IInterface"] });
-        expect(excludeDocs.map(i => i.name)).to.not.contain("IInterface");
+        const excludeDocs = fixture("interface.ts", { excludeNames: ["IInterface"] });
+        expect(excludeDocs.map((i) => i.name)).to.not.contain("IInterface");
     });
 
     describe("for interfaces", () => {
@@ -39,7 +37,7 @@ describe("TypeScript Documentation", function (this: Mocha) {
         it("includes documentation comment", () => {
             const entry = getEntry(docs, "IInterface");
             expect(entry.documentation).to.exist;
-            expect(entry.properties.every(p => p.documentation != null)).to.be.true;
+            expect(entry.properties.every((p) => p.documentation != null)).to.be.true;
         });
 
         it("returns interface properties", () => {
@@ -49,16 +47,16 @@ describe("TypeScript Documentation", function (this: Mocha) {
 
         it("detects property type", () => {
             const { properties } = getEntry(docs, "IInterface");
-            expect(properties.map(p => p.type)).to.deep.equal(["boolean", "HTMLElement", "Date", "string"]);
+            expect(properties.map((p) => p.type)).to.deep.equal(["boolean", "HTMLElement", "Date", "string"]);
         });
 
         it("detects optional properties", () => {
             const { properties } = getEntry(docs, "IInterface");
-            expect(properties.filter(p => p.optional).map(p => p.name)).to.deep.equal(["disabled", "fancy"]);
+            expect(properties.filter((p) => p.optional).map((p) => p.name)).to.deep.equal(["disabled", "fancy"]);
         });
 
         it("excludeNames excludes named properties", () => {
-            let excludeDocs = fixture("interface.ts", { excludeNames: ["value", /ed$/] });
+            const excludeDocs = fixture("interface.ts", { excludeNames: ["value", /ed$/] });
             expectInterface(excludeDocs, "IInterface", ["fancy"]);
         });
     });
@@ -85,14 +83,14 @@ describe("TypeScript Documentation", function (this: Mocha) {
                 ignoreDefinitions: true,
                 includeBasicTypeProperties: true,
             });
-            expect(basicDocs[1].properties.map(p => p.name)).to.contain.members(["toString", "lastIndexOf", "match"]);
+            expect(basicDocs[1].properties.map((p) => p.name)).to.contain.members(["toString", "lastIndexOf", "match"]);
         });
     });
 
     describe("with external dependencies", () => {
         it("knows about external properties", () => {
             docs = fixture("external.ts", {}, ["./typings/globals/react/index.d.ts"]);
-            expect(getEntry(docs, "IReactProps").properties.map(p => p.type))
+            expect(getEntry(docs, "IReactProps").properties.map((p) => p.type))
                 .to.deep.equal(["__React.EventHandler<MouseEvent>", "ReactElement<any> | string | number"]);
         });
     });
@@ -104,7 +102,7 @@ describe("TypeScript Documentation", function (this: Mocha) {
     }
 
     function getEntry<T extends IDocEntry>(entries: T[], name: string) {
-        for (let entry of entries) {
+        for (const entry of entries) {
             if (entry.name === name) { return entry; }
         }
         return null;

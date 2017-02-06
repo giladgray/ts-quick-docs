@@ -3,9 +3,7 @@ machine:
     version: 5.3
 test:
   pre:
-    # Circle has no default git config
-    - git config --global user.email "buildnode@circleci.com"
-    - git config --global user.name "Circle CI"
+    - npm run lint
 deployment:
   npm:
     tag: /.*/

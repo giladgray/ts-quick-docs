@@ -16,7 +16,7 @@ export function resolveFlags(docEntry: IDocEntry) {
             }
             // remove flag from output
             return "";
-        }
+        },
     );
     return docEntry;
 }
