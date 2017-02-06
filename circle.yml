@@ -1,9 +1,19 @@
 machine:
   node:
     version: 6.1
+dependencies:
+  cache_directories:
+    - ~/.cache/yarn
+  override:
+    - yarn
+    # preemptively check that yarn.lock hasn't changed after an install to avoid publishing errors later
+    - echo "Checking if yarn.lock changed..." && git diff --exit-code
+  post:
+    - yarn compile
 test:
-  pre:
-    - npm run lint
+  override:
+    - yarn test
+    - yarn lint
 deployment:
   npm:
     tag: /.*/
