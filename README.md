@@ -2,7 +2,7 @@
 
 > quick TypeScript documentation extractor
 
-This little tool parses a TypeScript project and spits out a big list of documentation objects for each `interface` and `const` discovered. That data file can be used to generate human-friendly documentation in any desired format.
+This little tool parses a TypeScript 2.1 project and spits out a big list of documentation objects for each `interface` and `const` discovered. That data file can be used to generate human-friendly documentation in any desired format.
 
 ## Usage
 

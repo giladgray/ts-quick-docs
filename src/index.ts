@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as ts from "typescript";
-import Documentation from "./src/documentation";
+import Documentation from "./documentation";
 
 // if run from the command line...
 if (!module.parent) {
@@ -16,5 +16,4 @@ if (!module.parent) {
     console.log(JSON.stringify(output, null, 2));
 }
 
-module.exports = Documentation.fromProgram;
-module.exports.fromFiles = Documentation.fromFiles;
+export default Documentation;

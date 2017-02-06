@@ -1,5 +1,4 @@
 node_modules/
 scripts/
+src/
 test/
-*.ts
-!*.d.ts
