@@ -53,7 +53,7 @@ export default class Documentation {
                     return this.serializeVariable(symbol, this.getFileName(node));
                 });
                 output.push(...list);
-            } else if (node.kind === ts.SyntaxKind.ModuleDeclaration || node.kind === ts.SyntaxKind.VariableStatement) {
+            } else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
                 // This is a namespace, visit its children
                 ts.forEachChild(node, visit);
             }

@@ -4,7 +4,7 @@ import * as path from "path";
 import Documentation, { IDocumentationOptions } from "../src/documentation";
 import { IDocEntry, IInterfaceEntry } from "../src/interfaces";
 
-describe("TypeScript Documentation", function(this: Mocha) {
+describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext) {
     this.slow(2000);
     this.timeout(5000);
 
