@@ -9,7 +9,7 @@ if (!module.parent) {
         jsx: ts.JsxEmit.React,
         module: ts.ModuleKind.None,
         noLib: true,
-        target: ts.ScriptTarget.ES6,
+        target: ts.ScriptTarget.ES2015,
     });
     const output = Documentation.fromProgram(program);
     /* tslint:disable-next-line:no-console */
