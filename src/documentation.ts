@@ -10,12 +10,16 @@ export interface IDocumentationOptions {
     /** Array of patterns to match against each file path and omit items that match. */
     excludePaths?: Array<string | RegExp>;
 
-    /** Whether `.d.ts` files should always be ignored. */
+    /**
+     * Whether `.d.ts` files should always be ignored.
+     * @default false
+     */
     ignoreDefinitions?: boolean;
 
     /**
      * Whether built-in properties for basic types should appear in the output (such as String.prototype.toString).
      * Defaults to `false` because these properties tend to pollute output for no benefit.
+     * @default false
      */
     includeBasicTypeProperties?: boolean;
 }
@@ -39,7 +43,11 @@ export default class Documentation {
 
     constructor(program: ts.Program, options: IDocumentationOptions = {}) {
         this.program = program;
-        this.options = options;
+        this.options = {
+            ignoreDefinitions: false,
+            includeBasicTypeProperties: false,
+            ...options,
+        };
     }
 
     public extract(): IInterfaceEntry[] {
