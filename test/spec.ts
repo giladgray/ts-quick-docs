@@ -1,6 +1,5 @@
 import { expect } from "chai";
 import * as path from "path";
-
 import Documentation, { IDocumentationOptions } from "../src/documentation";
 import { IDocEntry, IInterfaceEntry } from "../src/interfaces";
 
@@ -94,6 +93,30 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
             });
             expect(basicDocs[1].properties.map((p) => p.name)).to.contain.members(["toString", "lastIndexOf", "match"]);
         });
+    });
+
+    describe.only("jsdoc @tags", () => {
+        let entry: IInterfaceEntry;
+        before(() => entry = getEntry(fixture("jsdoc.ts"), "IJsDocInterface"));
+
+        [
+            "default",
+            "deprecated",
+            "internal",
+            "since",
+            "customFlag",
+        ].forEach((tag) => {
+            it(`detects @${tag}`, () => assertTagExists(tag));
+        });
+
+        it("works on interfaces too", () => {
+            expect(entry.tags.since).to.equal("0.5.0");
+        });
+
+        function assertTagExists(tag: string) {
+            const { tags } = entry.properties.find((p) => p.name === tag);
+            expect(tags[tag]).to.exist;
+        }
     });
 
     describe("with external dependencies", () => {
