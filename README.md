@@ -53,13 +53,15 @@ excluded from the output.
 Array of patterns that will be matched against each file's path. Matching files _will be_ parsed but
 entities in those files _will not_ appear in the output.
 
-#### ignoreDefinitions: `boolean = false`
+#### includeDefinitionFiles: `boolean = false`
 
-Whether to exclude `.d.ts` files from the generated documentation blob. Useful to ignore imported
-environment libraries, like `node.d.ts`.
+Whether to include symbols from `.d.ts` files in the generated documentation blob. These files are
+excluded from the output by default because they tend to produce a lot of noise: do you really need
+every symbol from `@types/node.d.ts`??
 
 #### includeBasicTypeProperties: `boolean = false`
 
 Whether built-in properties for basic types should appear in the output (such as
-`String.prototype.toString`). Basic types include boolean, number, string, and arrays of those
-three. Defaults to `false` because these properties tend to pollute output for no benefit.
+`String.prototype.toString`). Basic types include `boolean`, `number`, `string`, arrays of those
+three, string literals, and numeric literlas. Defaults to `false` because these properties tend to
+pollute output for no benefit.
