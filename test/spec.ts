@@ -15,7 +15,7 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
     it("errors if files is not an array", () => {
         expect(() => Documentation.fromFiles("path" as any, {})).to.throw("expected array");
         expect(() => Documentation.fromFiles(undefined, {})).to.throw("expected array");
-    })
+    });
 
     it("returns empty array for empty files", () => {
         const entries = Documentation.fromFiles([], { noLib: true }, { ignoreDefinitions: true });
