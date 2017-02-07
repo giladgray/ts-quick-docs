@@ -3,10 +3,7 @@ export interface IInterface {
     /** text value */
     value: string;
 
-    /**
-     * prevent interaction
-     * @default false
-     */
+    /** prevent interaction */
     disabled?: boolean;
 
     /** external type */

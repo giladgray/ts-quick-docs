@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as ts from "typescript";
 import { resolveFlags } from "./flags";
-import { IDocEntry, IInterfaceEntry, IPropertyEntry } from "./interfaces";
+import { IDocEntry, IInterfaceEntry, IJsDocTags, IPropertyEntry } from "./interfaces";
 
 export interface IDocumentationOptions {
     /** Array of patterns to match against each `name` and omit items that match. */
@@ -83,6 +83,13 @@ export default class Documentation {
         return path.relative(process.cwd(), node.getSourceFile().fileName);
     }
 
+    private getJsDocTags(symbol: ts.Symbol) {
+        return symbol.getJsDocTags().reduce((tags, { name, text }) => {
+            tags[name] = text.length > 0 ? text : true;
+            return tags;
+        }, {} as IJsDocTags);
+    }
+
     private getTypeOfSymbol(symbol: ts.Symbol) {
         return this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
     }
@@ -98,6 +105,7 @@ export default class Documentation {
             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
             fileName,
             name: symbol.getName(),
+            tags: this.getJsDocTags(symbol),
             type: this.getTypeString(symbol),
         };
     }
@@ -106,8 +114,7 @@ export default class Documentation {
         const details: IPropertyEntry = this.serializeSymbol(symbol, fileName);
         // tslint:disable-next-line:no-bitwise
         details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
-        symbol.getJsDocTags().map((flag) => details[flag.name] = flag.text);
-        return resolveFlags(details);
+        return details;
     }
 
     private serializeInterface(symbol: ts.Symbol, fileName: string) {
@@ -115,6 +122,7 @@ export default class Documentation {
             documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
             fileName,
             name: symbol.getName(),
+            tags: this.getJsDocTags(symbol),
             type: "interface",
         };
 
