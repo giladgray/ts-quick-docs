@@ -25,8 +25,11 @@ export default class Documentation {
         return new Documentation(program, options).extract();
     }
 
-    public static fromFiles(files: string[], compilerOptions?: ts.CompilerOptions, options?: IDocumentationOptions) {
-        return Documentation.fromProgram(ts.createProgram(files, compilerOptions), options);
+    public static fromFiles(filePaths: string[], compilerOptions: ts.CompilerOptions, options?: IDocumentationOptions) {
+        if (!Array.isArray(filePaths)) {
+            throw new Error(`expected array of file paths, received ${typeof filePaths}`);
+        }
+        return Documentation.fromProgram(ts.createProgram(filePaths, compilerOptions), options);
     }
 
     private program: ts.Program;

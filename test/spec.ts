@@ -12,8 +12,14 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
 
     it("exists", () => expect(Documentation).to.exist);
 
-    it.skip("returns empty array for empty files", () => {
-        expect(Documentation.fromFiles([], { noLib: true })).to.be.empty;
+    it("errors if files is not an array", () => {
+        expect(() => Documentation.fromFiles("path" as any, {})).to.throw("expected array");
+        expect(() => Documentation.fromFiles(undefined, {})).to.throw("expected array");
+    })
+
+    it("returns empty array for empty files", () => {
+        const entries = Documentation.fromFiles([], { noLib: true }, { ignoreDefinitions: true });
+        expect(entries).to.be.empty;
     });
 
     it("excludePaths excludes entire files", () => {
