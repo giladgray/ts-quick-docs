@@ -19,12 +19,12 @@
     "tslint": "4.4.2"
   },
   "scripts": {
-    "all": "npm run clean && npm run compile && npm run mocha",
+    "all": "npm run clean && npm run compile && npm run test",
     "clean": "rm -rf dist",
     "compile": "tsc --project .",
     "lint": "tslint src/**/*.ts test/**/*.ts",
     "test": "mocha --compilers ts:ts-node/register"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "Gilad Gray <giladgray@gmail.com>",
+  "license": "Apache-2.0"
 }
