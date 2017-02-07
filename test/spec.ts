@@ -37,6 +37,11 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
     describe("for interfaces", () => {
         before(() => docs = fixture("interface.ts"));
 
+        it.only("detects @default values", () => {
+            const { properties } = getEntry(docs, "IInterface");
+            expect(properties.find((p) => p.name === "disabled").default).to.equal("false");
+        });
+
         it("includes heritage clauses", () => {
             const entry = getEntry(docs, "IChildInterface");
             expect(entry.extends).to.deep.equal(["IInterface", "HTMLElement"]);

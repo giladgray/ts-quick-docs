@@ -106,6 +106,7 @@ export default class Documentation {
         const details: IPropertyEntry = this.serializeSymbol(symbol, fileName);
         // tslint:disable-next-line:no-bitwise
         details.optional = (symbol.flags & ts.SymbolFlags.Optional) !== 0;
+        symbol.getJsDocTags().map((flag) => details[flag.name] = flag.text);
         return resolveFlags(details);
     }
 
