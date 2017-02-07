@@ -1,6 +1,5 @@
 import * as path from "path";
 import * as ts from "typescript";
-import { resolveFlags } from "./flags";
 import { IDocEntry, IInterfaceEntry, IJsDocTags, IPropertyEntry } from "./interfaces";
 
 export interface IDocumentationOptions {
