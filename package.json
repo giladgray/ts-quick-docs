@@ -22,7 +22,7 @@
     "all": "npm run clean && npm run compile && npm run mocha",
     "clean": "rm -rf dist",
     "compile": "tsc --project .",
-    "lint": "tslint --project tsconfig.json",
+    "lint": "tslint src/**/*.ts test/**/*.ts",
     "test": "mocha --compilers ts:ts-node/register"
   },
   "author": "",

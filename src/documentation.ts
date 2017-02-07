@@ -133,7 +133,7 @@ export default class Documentation {
     private serializeVariable(symbol: ts.Symbol, fileName: string) {
         const details: IInterfaceEntry = this.serializeSymbol(symbol, fileName);
         details.fileName = fileName;
-        if (this.options.includeBasicTypeProperties || !/^(boolean|number|string)(\[\])?$/.test(details.type)) {
+        if (this.options.includeBasicTypeProperties || !isBasicType(details.type)) {
             // only get properties for a variable if it's not a basic type (or user explicitly enabled basic types)
             details.properties = this.getTypeOfSymbol(symbol).getProperties()
                 .filter(this.filterValueDeclaration)
@@ -156,4 +156,9 @@ export default class Documentation {
 /** Returns true if the value matches exactly none of the patterns. */
 function testNoMatches(value: string, patterns: Array<string | RegExp> = []) {
     return patterns.every((pattern) => value.match(pattern as string) == null);
+}
+
+function isBasicType(type: string) {
+    // built-in JS basic type or string literal ("boomtown") or numeric literal (500.6)
+    return /(boolean|number|string|RegExp)(\[\])?$/.test(type) || /^("|\d)/.test(type);
 }
