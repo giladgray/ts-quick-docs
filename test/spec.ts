@@ -76,13 +76,14 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
             expectInterface(docs, "colors", ["BLUE", "GREEN", "RED"]);
         });
 
-        it.skip("includeBasicTypeProperties=false has zero string properties", () => {
+        it("includeBasicTypeProperties=false has zero string properties", () => {
             const filepath = path.join(__dirname, "fixtures", "const.ts");
             const basicDocs = Documentation.fromFiles([filepath], { noLib: false }, {
                 ignoreDefinitions: true,
                 includeBasicTypeProperties: false,
             });
-            expect(basicDocs[1].properties).to.be.empty;
+            expect(basicDocs[1].properties).to.be.empty; // FILE_NAME
+            expect(basicDocs[2].properties).to.be.empty; // MAX_WIDTH
         });
 
         it("includeBasicTypeProperties=true includes tons of string properties", () => {
@@ -97,7 +98,7 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
 
     describe("with external dependencies", () => {
         it("knows about external properties", () => {
-            docs = fixture("external.ts", {}, ["./typings/globals/react/index.d.ts"]);
+            docs = fixture("external.ts", {});
             expect(getEntry(docs, "IReactProps").properties.map((p) => p.type))
                 .to.deep.equal(["React.EventHandler<MouseEvent<HTMLElement>>", "React.ReactChild"]);
         });

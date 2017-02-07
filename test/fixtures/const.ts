@@ -9,3 +9,5 @@ export const colors = {
 };
 
 export const FILE_NAME = "boomtown.tsx";
+
+export const MAX_WIDTH = 500.6;
