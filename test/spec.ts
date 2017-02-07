@@ -17,7 +17,7 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
     });
 
     it("returns empty array for empty files", () => {
-        const entries = Documentation.fromFiles([], { noLib: true }, { ignoreDefinitions: true });
+        const entries = Documentation.fromFiles([], { noLib: true });
         expect(entries).to.be.empty;
     });
 
@@ -31,6 +31,12 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
     it("excludeNames excludes named items", () => {
         const excludeDocs = fixture("interface.ts", { excludeNames: ["IInterface"] });
         expect(excludeDocs.map((i) => i.name)).to.not.contain("IInterface");
+    });
+
+    it("includeDefinitionFiles=true exposes @types symbols", () => {
+        const includeDocs = Documentation.fromFiles([], { noLib: true }, { includeDefinitionFiles: true });
+        // no source files of our own so everything exposed should come from @types .d.ts files
+        includeDocs.map((entry) => expect(entry.fileName).to.match(/\.d\.ts$/));
     });
 
     describe("for interfaces", () => {
@@ -78,7 +84,6 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
         it("includeBasicTypeProperties=false has zero string properties", () => {
             const filepath = path.join(__dirname, "fixtures", "const.ts");
             const basicDocs = Documentation.fromFiles([filepath], { noLib: false }, {
-                ignoreDefinitions: true,
                 includeBasicTypeProperties: false,
             });
             expect(basicDocs[1].properties).to.be.empty; // FILE_NAME
@@ -88,14 +93,13 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
         it("includeBasicTypeProperties=true includes tons of string properties", () => {
             const filepath = path.join(__dirname, "fixtures", "const.ts");
             const basicDocs = Documentation.fromFiles([filepath], { noLib: false }, {
-                ignoreDefinitions: true,
                 includeBasicTypeProperties: true,
             });
             expect(basicDocs[1].properties.map((p) => p.name)).to.contain.members(["toString", "lastIndexOf", "match"]);
         });
     });
 
-    describe.only("jsdoc @tags", () => {
+    describe("jsdoc @tags", () => {
         let entry: IInterfaceEntry;
         before(() => entry = getEntry(fixture("jsdoc.ts"), "IJsDocInterface"));
 
