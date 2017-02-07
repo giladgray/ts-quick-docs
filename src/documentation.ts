@@ -10,17 +10,18 @@ export interface IDocumentationOptions {
     excludePaths?: Array<string | RegExp>;
 
     /**
-     * Whether `.d.ts` files should always be ignored.
-     * @default false
-     */
-    ignoreDefinitions?: boolean;
-
-    /**
      * Whether built-in properties for basic types should appear in the output (such as String.prototype.toString).
      * Defaults to `false` because these properties tend to pollute output for no benefit.
      * @default false
      */
     includeBasicTypeProperties?: boolean;
+
+    /**
+     * Whether symbols from `.d.ts` files should be included in the output.
+     * Enabling this can get very messy as everything from `@types` will be included.
+     * @default false
+     */
+    includeDefinitionFiles?: boolean;
 }
 
 export default class Documentation {
@@ -43,8 +44,8 @@ export default class Documentation {
     constructor(program: ts.Program, options: IDocumentationOptions = {}) {
         this.program = program;
         this.options = {
-            ignoreDefinitions: false,
             includeBasicTypeProperties: false,
+            includeDefinitionFiles: false,
             ...options,
         };
     }
@@ -71,7 +72,7 @@ export default class Documentation {
 
         // Visit every sourceFile in the program
         for (const sourceFile of this.program.getSourceFiles()) {
-            if (this.options.ignoreDefinitions && /\.d\.ts$/.test(sourceFile.fileName)) { continue; }
+            if (!this.options.includeDefinitionFiles && /\.d\.ts$/.test(sourceFile.fileName)) { continue; }
             // Walk the tree to search for classes
             ts.forEachChild(sourceFile, visit);
         }
