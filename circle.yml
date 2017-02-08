@@ -14,8 +14,3 @@ test:
   override:
     - yarn test
     - yarn lint
-deployment:
-  npm:
-    tag: /.*/
-    commands:
-      - npm publish
