@@ -2,6 +2,8 @@ import * as path from "path";
 import * as ts from "typescript";
 import { IDocEntry, IInterfaceEntry, IJsDocTags, IPropertyEntry } from "./interfaces";
 
+export * from "./interfaces";
+
 export interface IDocumentationOptions {
     /** Array of patterns to match against each `name` and omit items that match. */
     excludeNames?: Array<string | RegExp>;
