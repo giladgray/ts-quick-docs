@@ -1,6 +1,6 @@
 {
   "name": "ts-quick-docs",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "quick TypeScript documentation extractor",
   "bin": "dist/index.js",
   "main": "dist/documentation.js",
