@@ -6,7 +6,6 @@
   "main": "dist/documentation.js",
   "types": "dist/documentation.d.ts",
   "dependencies": {
-    "ts-jest": "^19.0.10",
     "typescript": "2.1"
   },
   "devDependencies": {
@@ -15,6 +14,7 @@
     "@types/react": "15.0.6",
     "jest": "^19.0.2",
     "npm-run-all": "^4.0.2",
+    "ts-jest": "^19.0.10",
     "ts-node": "^3.0.2",
     "tslint": "^5.1.0"
   },
