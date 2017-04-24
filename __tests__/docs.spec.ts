@@ -17,23 +17,25 @@ describe("TypeScript Documentation", () => {
         expect(entries).toHaveLength(0);
     });
 
-    it("excludePaths excludes entire files", () => {
-        let excludeDocs = fixture("interface.ts", { excludePaths: ["interface.ts"] });
-        expect(excludeDocs).toHaveLength(0);
-        excludeDocs = fixture("interface.ts", { excludePaths: [/.*\.ts$/] });
-        expect(excludeDocs).toHaveLength(0);
-    });
+    describe("options", () => {
+        it("excludePaths excludes entire files", () => {
+            let excludeDocs = fixture("interface.ts", { excludePaths: ["interface.ts"] });
+            expect(excludeDocs).toHaveLength(0);
+            excludeDocs = fixture("interface.ts", { excludePaths: [/.*\.ts$/] });
+            expect(excludeDocs).toHaveLength(0);
+        });
 
-    it("excludeNames excludes named items", () => {
-        const excludeDocs = fixture("interface.ts", { excludeNames: ["IInterface"] });
-        expect(excludeDocs.map((i) => i.name)).not.toContain("IInterface");
-    });
+        it("excludeNames excludes named items", () => {
+            const excludeDocs = fixture("interface.ts", { excludeNames: ["IInterface"] });
+            expect(excludeDocs.map((i) => i.name)).not.toContain("IInterface");
+        });
 
-    it("includeDefinitionFiles=true exposes @types symbols", () => {
-        const includeDocs = Documentation.fromFiles([], { noLib: true }, { includeDefinitionFiles: true });
-        // no source files of our own so everything exposed should come from @types .d.ts files
-        includeDocs.map((entry) => expect(entry.fileName).toMatch(/\.d\.ts$/));
-    });
+        it("includeDefinitionFiles=true exposes @types symbols", () => {
+            const includeDocs = Documentation.fromFiles([], { noLib: true }, { includeDefinitionFiles: true });
+            // no source files of our own so everything exposed should come from @types .d.ts files
+            includeDocs.map((entry) => expect(entry.fileName).toMatch(/\.d\.ts$/));
+        });
+    })
 
     describe("for interfaces", () => {
         beforeAll(() => docs = fixture("interface.ts"));
