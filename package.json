@@ -19,7 +19,7 @@
     "tslint": "^5.1.0"
   },
   "scripts": {
-    "prepublish": "run-s clean compile lint test",
+    "build": "run-s clean compile lint test",
     "clean": "rm -rf dist",
     "compile": "tsc --project .",
     "lint": "tslint src/*.ts __tests__/*.ts",
