@@ -25,7 +25,7 @@ export interface IDocEntry {
     name: string;
     tags: IJsDocTags;
     type: string;
-};
+}
 
 export interface IPropertyEntry extends IDocEntry {
     optional?: boolean;
