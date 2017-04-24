@@ -35,7 +35,7 @@ describe("TypeScript Documentation", () => {
             // no source files of our own so everything exposed should come from @types .d.ts files
             includeDocs.map((entry) => expect(entry.fileName).toMatch(/\.d\.ts$/));
         });
-    })
+    });
 
     describe("for interfaces", () => {
         beforeAll(() => docs = fixture("interface.ts"));
