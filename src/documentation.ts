@@ -61,7 +61,6 @@ export default class Documentation {
                 const symbol = this.checker.getSymbolAtLocation((node as ts.InterfaceDeclaration).name);
                 output.push(this.serializeInterface(symbol, this.getFileName(node)));
             } else if (node.kind === ts.SyntaxKind.ClassDeclaration) {
-                const delcaration = node as ts.ClassDeclaration;
                 const symbol = this.checker.getSymbolAtLocation((node as ts.ClassDeclaration).name);
                 output.push(this.serializeClass(symbol, this.getFileName(node)));
             } else if (node.kind === ts.SyntaxKind.VariableStatement) {
@@ -159,7 +158,7 @@ export default class Documentation {
             details.extends = classNode.heritageClauses[0].types.map((type) => type.getText());
         }
 
-        // Get the props signatures
+        // Get the member signatures
         details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
             .filter(this.filterValueDeclaration)
             .map((sym) => this.serializeDeclaration(sym, fileName))

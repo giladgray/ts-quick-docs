@@ -107,11 +107,13 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
             expect(entry.documentation.trim()).equals("A class");
         });
 
-        it("includes field", () => {
+        it("includes private and public fields", () => {
             const properties = getEntry(docs, "Class").properties;
-            expect(properties.length).equals(1);
-            expect(properties[0].name).equals("value");
-            expect(properties[0].documentation.trim()).equals("text value");
+            expect(properties.length).equals(2);
+            expect(properties[0].name).equals("privateValue");
+            expect(properties[0].documentation.trim()).equals("private text value");
+            expect(properties[1].name).equals("publicValue");
+            expect(properties[1].documentation.trim()).equals("public text value");
         });
     });
 
