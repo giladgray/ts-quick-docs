@@ -15,9 +15,9 @@
     "@types/react": "15.0.6",
     "chai": "3.5.0",
     "mocha": "2.4.5",
-    "npm-run-all": "4.0.1",
-    "ts-node": "2.0.0",
-    "tslint": "4.4.2"
+    "npm-run-all": "^4.0.2",
+    "ts-node": "^3.0.2",
+    "tslint": "^5.1.0"
   },
   "scripts": {
     "prepublish": "run-s clean compile lint test",
