@@ -22,7 +22,7 @@
     "prepublish": "run-s clean compile lint test",
     "clean": "rm -rf dist",
     "compile": "tsc --project .",
-    "lint": "tslint src/**/*.ts test/**/*.ts",
+    "lint": "tslint src/*.ts __tests__/*.ts",
     "test": "jest --config jest.config.json"
   },
   "author": "Gilad Gray <giladgray@gmail.com>",
