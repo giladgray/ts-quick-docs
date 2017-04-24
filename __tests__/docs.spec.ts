@@ -1,56 +1,52 @@
-import { expect } from "chai";
 import * as path from "path";
 import Documentation, { IDocumentationOptions } from "../src/documentation";
 import { IDocEntry, IInterfaceEntry } from "../src/interfaces";
 
-describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext) {
-    this.slow(2000);
-    this.timeout(5000);
-
+describe("TypeScript Documentation", () => {
     let docs: IInterfaceEntry[];
 
-    it("exists", () => expect(Documentation).to.exist);
+    it("exists", () => expect(Documentation).toBeDefined());
 
     it("errors if files is not an array", () => {
-        expect(() => Documentation.fromFiles("path" as any, {})).to.throw("expected array");
-        expect(() => Documentation.fromFiles(undefined, {})).to.throw("expected array");
+        expect(() => Documentation.fromFiles("path" as any, {})).toThrow("expected array");
+        expect(() => Documentation.fromFiles(undefined, {})).toThrow("expected array");
     });
 
     it("returns empty array for empty files", () => {
         const entries = Documentation.fromFiles([], { noLib: true });
-        expect(entries).to.be.empty;
+        expect(entries).toHaveLength(0);
     });
 
     it("excludePaths excludes entire files", () => {
         let excludeDocs = fixture("interface.ts", { excludePaths: ["interface.ts"] });
-        expect(excludeDocs, "supports string pattern").to.be.empty;
+        expect(excludeDocs).toHaveLength(0);
         excludeDocs = fixture("interface.ts", { excludePaths: [/.*\.ts$/] });
-        expect(excludeDocs, "supports RegExp pattern").to.be.empty;
+        expect(excludeDocs).toHaveLength(0);
     });
 
     it("excludeNames excludes named items", () => {
         const excludeDocs = fixture("interface.ts", { excludeNames: ["IInterface"] });
-        expect(excludeDocs.map((i) => i.name)).to.not.contain("IInterface");
+        expect(excludeDocs.map((i) => i.name)).not.toContain("IInterface");
     });
 
     it("includeDefinitionFiles=true exposes @types symbols", () => {
         const includeDocs = Documentation.fromFiles([], { noLib: true }, { includeDefinitionFiles: true });
         // no source files of our own so everything exposed should come from @types .d.ts files
-        includeDocs.map((entry) => expect(entry.fileName).to.match(/\.d\.ts$/));
+        includeDocs.map((entry) => expect(entry.fileName).toMatch(/\.d\.ts$/));
     });
 
     describe("for interfaces", () => {
-        before(() => docs = fixture("interface.ts"));
+        beforeAll(() => docs = fixture("interface.ts"));
 
         it("includes heritage clauses", () => {
             const entry = getEntry(docs, "IChildInterface");
-            expect(entry.extends).to.deep.equal(["IInterface", "HTMLElement"]);
+            expect(entry.extends).toEqual(["IInterface", "HTMLElement"]);
         });
 
         it("includes documentation comment", () => {
             const entry = getEntry(docs, "IInterface");
-            expect(entry.documentation).to.exist;
-            expect(entry.properties.every((p) => p.documentation != null)).to.be.true;
+            expect(entry.documentation).toBeDefined();
+            expect(entry.properties.every((p) => p.documentation != null)).toBe(true);
         });
 
         it("returns interface properties", () => {
@@ -60,12 +56,12 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
 
         it("detects property type", () => {
             const { properties } = getEntry(docs, "IInterface");
-            expect(properties.map((p) => p.type)).to.deep.equal(["boolean", "HTMLElement", "Date", "string"]);
+            expect(properties.map((p) => p.type)).toEqual(["boolean", "HTMLElement", "Date", "string"]);
         });
 
         it("detects optional properties", () => {
             const { properties } = getEntry(docs, "IInterface");
-            expect(properties.filter((p) => p.optional).map((p) => p.name)).to.deep.equal(["disabled", "fancy"]);
+            expect(properties.filter((p) => p.optional).map((p) => p.name)).toEqual(["disabled", "fancy"]);
         });
 
         it("excludeNames excludes named properties", () => {
@@ -75,7 +71,7 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
     });
 
     describe("for consts", () => {
-        before(() => docs = fixture("const.ts"));
+        beforeAll(() => docs = fixture("const.ts"));
 
         it("returns const properties", () => {
             expectInterface(docs, "colors", ["BLUE", "GREEN", "RED"]);
@@ -86,8 +82,8 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
             const basicDocs = Documentation.fromFiles([filepath], { noLib: false }, {
                 includeBasicTypeProperties: false,
             });
-            expect(basicDocs[1].properties).to.be.empty; // FILE_NAME
-            expect(basicDocs[2].properties).to.be.empty; // MAX_WIDTH
+            expect(basicDocs[1].properties).toHaveLength(0); // FILE_NAME
+            expect(basicDocs[2].properties).toHaveLength(0); // MAX_WIDTH
         });
 
         it("includeBasicTypeProperties=true includes tons of string properties", () => {
@@ -95,31 +91,34 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
             const basicDocs = Documentation.fromFiles([filepath], { noLib: false }, {
                 includeBasicTypeProperties: true,
             });
-            expect(basicDocs[1].properties.map((p) => p.name)).to.contain.members(["toString", "lastIndexOf", "match"]);
+            const properties = basicDocs[1].properties.map((p) => p.name);
+            expect(properties).toContain("toString");
+            expect(properties).toContain("lastIndexOf");
+            expect(properties).toContain("match");
         });
     });
 
     describe("for classes", () => {
-        before(() => docs = fixture("class.ts"));
+        beforeAll(() => docs = fixture("class.ts"));
 
         it("includes documentation comment", () => {
             const entry = getEntry(docs, "Class");
-            expect(entry.documentation.trim()).equals("A class");
+            expect(entry.documentation.trim()).toBe("A class");
         });
 
         it("includes private and public fields", () => {
             const properties = getEntry(docs, "Class").properties;
-            expect(properties.length).equals(2);
-            expect(properties[0].name).equals("privateValue");
-            expect(properties[0].documentation.trim()).equals("private text value");
-            expect(properties[1].name).equals("publicValue");
-            expect(properties[1].documentation.trim()).equals("public text value");
+            expect(properties.length).toBe(2);
+            expect(properties[0].name).toBe("privateValue");
+            expect(properties[0].documentation.trim()).toBe("private text value");
+            expect(properties[1].name).toBe("publicValue");
+            expect(properties[1].documentation.trim()).toBe("public text value");
         });
     });
 
     describe("jsdoc @tags", () => {
         let entry: IInterfaceEntry;
-        before(() => entry = getEntry(fixture("jsdoc.ts"), "IJsDocInterface"));
+        beforeAll(() => entry = getEntry(fixture("jsdoc.ts"), "IJsDocInterface"));
 
         [
             "default",
@@ -132,12 +131,12 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
         });
 
         it("works on interfaces too", () => {
-            expect(entry.tags.since).to.equal("0.5.0");
+            expect(entry.tags.since).toBe("0.5.0");
         });
 
         function assertTagExists(tag: string) {
             const { tags } = entry.properties.find((p) => p.name === tag);
-            expect(tags[tag]).to.exist;
+            expect(tags[tag]).toBeDefined();
         }
     });
 
@@ -145,7 +144,7 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
         it("knows about external properties", () => {
             docs = fixture("external.ts", {});
             expect(getEntry(docs, "IReactProps").properties.map((p) => p.type))
-                .to.deep.equal(["React.EventHandler<MouseEvent<HTMLElement>>", "React.ReactChild"]);
+                .toEqual(["React.EventHandler<MouseEvent<HTMLElement>>", "React.ReactChild"]);
         });
     });
 
@@ -164,8 +163,8 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
 
     function expectInterface(entries: IInterfaceEntry[], name: string, properties?: string[]) {
         const entry = getEntry(entries, name);
-        expect(entry.name).to.deep.equal(name);
-        expect(entry.properties.map((p) => p.name)).to.deep.equal(properties);
+        expect(entry.name).toEqual(name);
+        expect(entry.properties.map((p) => p.name)).toEqual(properties);
         expect(entry.properties.every((p) => p.documentation !== ""));
     }
 });
