@@ -60,6 +60,9 @@ export default class Documentation {
                 // This is a top level interface, get its symbol
                 const symbol = this.checker.getSymbolAtLocation((node as ts.InterfaceDeclaration).name);
                 output.push(this.serializeInterface(symbol, this.getFileName(node)));
+            } else if (node.kind === ts.SyntaxKind.ClassDeclaration) {
+                const symbol = this.checker.getSymbolAtLocation((node as ts.ClassDeclaration).name);
+                output.push(this.serializeClass(symbol, this.getFileName(node)));
             } else if (node.kind === ts.SyntaxKind.VariableStatement) {
                 const list = (node as ts.VariableStatement).declarationList.declarations.map((decl) => {
                     const symbol = this.checker.getSymbolAtLocation(decl.name);
@@ -134,6 +137,28 @@ export default class Documentation {
         }
 
         // Get the props signatures
+        details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
+            .filter(this.filterValueDeclaration)
+            .map((sym) => this.serializeDeclaration(sym, fileName))
+            .filter(this.filterEntry);
+        return details;
+    }
+
+    private serializeClass(symbol: ts.Symbol, fileName: string) {
+        const details: IInterfaceEntry = {
+            documentation: ts.displayPartsToString(symbol.getDocumentationComment()),
+            fileName,
+            name: symbol.getName(),
+            tags: this.getJsDocTags(symbol),
+            type: "class",
+        };
+
+        const classNode = symbol.declarations[0] as ts.ClassDeclaration;
+        if (classNode.heritageClauses != null) {
+            details.extends = classNode.heritageClauses[0].types.map((type) => type.getText());
+        }
+
+        // Get the member signatures
         details.properties = Object.keys(symbol.members).sort().map((name) => symbol.members[name])
             .filter(this.filterValueDeclaration)
             .map((sym) => this.serializeDeclaration(sym, fileName))

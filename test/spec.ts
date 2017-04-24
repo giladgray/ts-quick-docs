@@ -99,6 +99,24 @@ describe("TypeScript Documentation", function(this: Mocha.ISuiteCallbackContext)
         });
     });
 
+    describe("for classes", () => {
+        before(() => docs = fixture("class.ts"));
+
+        it("includes documentation comment", () => {
+            const entry = getEntry(docs, "Class");
+            expect(entry.documentation.trim()).equals("A class");
+        });
+
+        it("includes private and public fields", () => {
+            const properties = getEntry(docs, "Class").properties;
+            expect(properties.length).equals(2);
+            expect(properties[0].name).equals("privateValue");
+            expect(properties[0].documentation.trim()).equals("private text value");
+            expect(properties[1].name).equals("publicValue");
+            expect(properties[1].documentation.trim()).equals("public text value");
+        });
+    });
+
     describe("jsdoc @tags", () => {
         let entry: IInterfaceEntry;
         before(() => entry = getEntry(fixture("jsdoc.ts"), "IJsDocInterface"));
