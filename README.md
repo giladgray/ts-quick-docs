@@ -2,6 +2,8 @@
 
 > quick TypeScript documentation extractor
 
+### :warning: :fire: This project is deprecated. Use [documentalist](https://github.com/palantir/documentalist) instead. :fire: :warning:
+
 This little tool parses a **TypeScript 2.1** project and spits out a big list of documentation
 objects for each `interface` and `const` discovered. That data file can be used to generate
 human-friendly documentation in any desired format.
